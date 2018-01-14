@@ -15,7 +15,7 @@ import ru.ifmo.orthant.nds.impl.OrthantImplementation;
 @Warmup(iterations = 5, time = 1)
 @Measurement(iterations = 1, time = 1)
 @Fork(value = 3)
-public class JMHBenchmark {
+public class NDSBenchmark {
     private NonDominatedSorting sorting;
     private double[][][] instances;
     private int[] ranks;
@@ -41,7 +41,7 @@ public class JMHBenchmark {
         }
         switch (algorithmId) {
             case "NaiveImplementation": sorting = new NaiveImplementation(n, d); break;
-            case "OrthantImplementation": sorting = new OrthantImplementation(new NaiveOrthantSearch(n, d)); break;
+            case "OrthantNaive": sorting = new OrthantImplementation(new NaiveOrthantSearch(n, d)); break;
             default: throw new AssertionError("Algorithm ID '" + algorithmId + "' is not known");
         }
         ranks = new int[n];
