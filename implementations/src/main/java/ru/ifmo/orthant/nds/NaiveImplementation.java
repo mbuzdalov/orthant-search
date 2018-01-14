@@ -4,12 +4,14 @@ import java.util.Arrays;
 
 public class NaiveImplementation extends NonDominatedSorting {
     private final PointWrapper[] wrappers;
+    private final int maxDimension;
 
-    public NaiveImplementation(int maximumPoints) {
+    public NaiveImplementation(int maximumPoints, int maximumDimension) {
         wrappers = new PointWrapper[maximumPoints];
         for (int i = 0; i < maximumPoints; ++i) {
             wrappers[i] = new PointWrapper();
         }
+        maxDimension = maximumDimension;
     }
 
     @Override
@@ -19,7 +21,7 @@ public class NaiveImplementation extends NonDominatedSorting {
 
     @Override
     public int getMaximumDimension() {
-        return Integer.MAX_VALUE;
+        return maxDimension;
     }
 
     private boolean dominates(double[] a, double[] b) {
@@ -43,19 +45,20 @@ public class NaiveImplementation extends NonDominatedSorting {
             wrappers[i].point = points[i];
             wrappers[i].rank = 0;
         }
-        Arrays.sort(wrappers);
+        Arrays.sort(wrappers, 0, n);
         for (int i = 0; i < n; ++i) {
             PointWrapper ii = wrappers[i];
-            int rr = ranks[ii.index];
+            int rr = ii.rank;
             for (int j = i + 1; j < n; ++j) {
                 PointWrapper jj = wrappers[j];
-                if (rr >= ranks[jj.index] && dominates(ii.point, jj.point)) {
-                    ranks[jj.index] = rr + 1;
+                if (rr >= jj.rank && dominates(ii.point, jj.point)) {
+                    jj.rank = rr + 1;
                 }
             }
         }
         for (int i = 0; i < n; ++i) {
             ranks[wrappers[i].index] = wrappers[i].rank;
+            wrappers[i].point = null;
         }
     }
 
