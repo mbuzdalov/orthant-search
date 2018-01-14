@@ -12,12 +12,14 @@ public final class OrthantImplementation extends NonDominatedSorting {
     private final int[] additionalCollection;
     private final boolean[] allTrueArray;
     private final boolean[] allFalseArray;
+    private final int[] queryStore;
 
     public OrthantImplementation(OrthantSearch orthantSearch) {
         int maxPoints = orthantSearch.getMaximumPoints();
         this.orthantSearch = orthantSearch;
         this.rankTypeClass = new RankTypeClass();
         this.additionalCollection = rankTypeClass.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
+        this.queryStore = new int[maxPoints];
         this.allTrueArray = new boolean[maxPoints];
         Arrays.fill(allTrueArray, true);
         this.allFalseArray = new boolean[orthantSearch.getMaximumDimension()];
@@ -35,10 +37,10 @@ public final class OrthantImplementation extends NonDominatedSorting {
 
     @Override
     public void sort(double[][] points, int[] ranks) {
+        int n = points.length;
         Arrays.fill(ranks, 1);
-        orthantSearch.runSearch(points, ranks,
-                0, points.length,
-                allTrueArray, allTrueArray,
+        orthantSearch.runSearch(points, ranks, queryStore,
+                0, n, allTrueArray, allTrueArray,
                 additionalCollection, rankTypeClass, allFalseArray);
     }
 
@@ -71,7 +73,7 @@ public final class OrthantImplementation extends NonDominatedSorting {
         }
 
         @Override
-        public void storeQuery(int[] source, int sourceIndex, int[] target, int targetIndex) {
+        public void queryToData(int[] source, int sourceIndex, int[] target, int targetIndex) {
             target[targetIndex] += source[sourceIndex];
         }
     }

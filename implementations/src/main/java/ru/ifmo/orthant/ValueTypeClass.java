@@ -66,5 +66,5 @@ public abstract class ValueTypeClass<T> {
      * @param target the target collection.
      * @param targetIndex the index of the element in the target collection, which contains final query results..
      */
-    public abstract void storeQuery(T source, int sourceIndex, T target, int targetIndex);
+    public abstract void queryToData(T source, int sourceIndex, T target, int targetIndex);
 }

@@ -45,12 +45,14 @@ public abstract class OrthantSearch {
      *
      * A query point {@code Q} is served the following way. First, the query answer {@code A} is evaluated
      * which is equal to composition ({@link ValueTypeClass#add(Object, int, Object, int)}) of
-     * data values {@code collection[P]} for all data points {@code P} such that {@code P} dominates {@code Q}.
-     * Second, the query result is put into {@code collection[Q]} using
-     * {@link ValueTypeClass#storeQuery(Object, int, Object, int)}.
+     * data values {@code dataCollection[P]} for all data points {@code P} such that {@code P} dominates {@code Q}.
+     * Second, this value is put into query collection, as in {@code queryCollection[Q] = A}.
+     * Third, if {@code Q} is also a data point, the query result is added to {@code dataCollection[Q]} using
+     * {@link ValueTypeClass#queryToData(Object, int, Object, int)}.
      *
      * @param points the points.
-     * @param collection the collection for data values (in) and query answers (out).
+     * @param dataCollection the collection for data values.
+     * @param queryCollection the collection for query answers.
      * @param from the index of the first (inclusively) point to be processed.
      * @param until the index of the last (exclusively) point to be processed.
      * @param isDataPoint {@code isDataPoint[i]} is {@code true} if {@code i} is a data point.
@@ -61,7 +63,7 @@ public abstract class OrthantSearch {
      * @param <T> the type of a collection which stores data values for data points and query answers for query points.
      */
     public <T> void runSearch(
-            double[][] points, T collection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until,
             boolean[] isDataPoint,
             boolean[] isQueryPoint,
             T additionalCollection,
@@ -69,7 +71,8 @@ public abstract class OrthantSearch {
             boolean[] isObjectiveStrict
     ) {
         Objects.requireNonNull(points, "points must not be null");
-        Objects.requireNonNull(collection, "collection must not be null");
+        Objects.requireNonNull(dataCollection, "dataCollection must not be null");
+        Objects.requireNonNull(queryCollection, "queryCollection must not be null");
         Objects.requireNonNull(typeClass, "typeClass must not be null");
         Objects.requireNonNull(isObjectiveStrict, "isObjectiveStrict must not be null");
         Objects.requireNonNull(isDataPoint, "isDataPoint must not be null");
@@ -79,9 +82,13 @@ public abstract class OrthantSearch {
             throw new IllegalArgumentException("The interval [" + from + "; " + until
                     + ") is illegal");
         }
-        if (until > typeClass.size(collection)) {
+        if (until > typeClass.size(dataCollection)) {
             throw new IllegalArgumentException("The interval [" + from + "; " + until
-                    + ") is illegal for collection with size " + typeClass.size(collection));
+                    + ") is illegal for dataCollection with size " + typeClass.size(dataCollection));
+        }
+        if (until > typeClass.size(queryCollection)) {
+            throw new IllegalArgumentException("The interval [" + from + "; " + until
+                    + ") is illegal for queryCollection with size " + typeClass.size(queryCollection));
         }
         if (until > points.length) {
             throw new IllegalArgumentException("The interval [" + from + "; " + until
@@ -121,12 +128,12 @@ public abstract class OrthantSearch {
             throw new IllegalArgumentException("The array isObjectiveStrict has size " + isObjectiveStrict.length
                     + ", which is too small for dimension " + dimension);
         }
-        runSearchImpl(points, collection, from, until,
+        runSearchImpl(points, dataCollection, queryCollection, from, until,
                 isDataPoint, isQueryPoint, additionalCollection, typeClass, isObjectiveStrict);
     }
 
     protected abstract <T> void runSearchImpl(
-            double[][] points, T collection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until,
             boolean[] isDataPoint,
             boolean[] isQueryPoint,
             T additionalCollection,

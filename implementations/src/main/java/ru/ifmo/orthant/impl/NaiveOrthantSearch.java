@@ -29,12 +29,12 @@ public final class NaiveOrthantSearch extends OrthantSearch {
 
     @Override
     public int getAdditionalCollectionSize(int nPoints) {
-        return 1;
+        return 0;
     }
 
     @Override
     protected <T> void runSearchImpl(
-            double[][] points, T collection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until,
             boolean[] isDataPoint, boolean[] isQueryPoint, T additionalCollection,
             ValueTypeClass<T> typeClass, boolean[] isObjectiveStrict) {
         for (int i = from; i < until; ++i) {
@@ -44,16 +44,19 @@ public final class NaiveOrthantSearch extends OrthantSearch {
         Arrays.sort(wrappers, from, until);
         for (int q = from; q < until; ++q) {
             PointWrapper Q = wrappers[q];
-            if (isQueryPoint[Q.index]) {
-                // additionalCollection[0] will be the raw result of the query.
-                typeClass.fillWithZeroes(additionalCollection, 0, 1);
+            int qi = Q.index;
+            if (isQueryPoint[qi]) {
+                typeClass.fillWithZeroes(queryCollection, qi, qi + 1);
                 for (int d = from; d < q; ++d) {
                     PointWrapper D = wrappers[d];
-                    if (isDataPoint[D.index] && dominates(D.point, Q.point, isObjectiveStrict)) {
-                        typeClass.add(collection, D.index, additionalCollection, 0);
+                    int di = D.index;
+                    if (isDataPoint[di] && dominates(D.point, Q.point, isObjectiveStrict)) {
+                        typeClass.add(dataCollection, di, queryCollection, qi);
                     }
                 }
-                typeClass.storeQuery(additionalCollection, 0, collection, Q.index);
+                if (isDataPoint[qi]) {
+                    typeClass.queryToData(queryCollection, qi, dataCollection, qi);
+                }
             }
         }
         for (int i = from; i < until; ++i) {
