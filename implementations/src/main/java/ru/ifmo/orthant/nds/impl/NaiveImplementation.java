@@ -1,8 +1,10 @@
-package ru.ifmo.orthant.nds;
+package ru.ifmo.orthant.nds.impl;
 
 import java.util.Arrays;
 
-public class NaiveImplementation extends NonDominatedSorting {
+import ru.ifmo.orthant.nds.NonDominatedSorting;
+
+public final class NaiveImplementation extends NonDominatedSorting {
     private final PointWrapper[] wrappers;
     private final int maxDimension;
 

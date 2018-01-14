@@ -1,11 +1,12 @@
-package ru.ifmo.orthant.nds;
+package ru.ifmo.orthant.nds.impl;
 
 import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
+import ru.ifmo.orthant.nds.NonDominatedSorting;
 
-public class OrthantImplementation extends NonDominatedSorting {
+public final class OrthantImplementation extends NonDominatedSorting {
     private final OrthantSearch orthantSearch;
     private final RankTypeClass rankTypeClass;
     private final int[] additionalCollection;
@@ -18,6 +19,7 @@ public class OrthantImplementation extends NonDominatedSorting {
         this.rankTypeClass = new RankTypeClass();
         this.additionalCollection = rankTypeClass.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
         this.allTrueArray = new boolean[maxPoints];
+        Arrays.fill(allTrueArray, true);
         this.allFalseArray = new boolean[orthantSearch.getMaximumDimension()];
     }
 
