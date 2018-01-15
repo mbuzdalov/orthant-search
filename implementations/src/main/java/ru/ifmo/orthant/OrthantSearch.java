@@ -98,7 +98,7 @@ public abstract class OrthantSearch {
         if (requiredAdditionalSize != 0) {
             Objects.requireNonNull(additionalCollection,
                     "When additional collection size must be non-zero, additionalCollection must not be null");
-            if (requiredAdditionalSize < typeClass.size(additionalCollection)) {
+            if (requiredAdditionalSize > typeClass.size(additionalCollection)) {
                 throw new IllegalArgumentException("additionalCollection of size "
                         + typeClass.size(additionalCollection) + " is too small for " + (until - from) + " points");
             }
