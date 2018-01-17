@@ -153,8 +153,8 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 } else if (from + 2 == until) {
                     int firstIndex = indices[from], secondIndex = indices[from + 1];
                     completePoint(firstIndex);
-                    if (isDataPoint[firstIndex] && isQueryPoint[secondIndex] && dominates(firstIndex, secondIndex, d)) {
-                        typeClass.add(dataCollection, firstIndex, queryCollection, secondIndex);
+                    if (isDataPoint[firstIndex] && isQueryPoint[secondIndex]) {
+                        addIfDominates(firstIndex, secondIndex, d);
                     }
                     completePoint(secondIndex);
                 } else if (d == 1) {
@@ -275,20 +275,14 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         void helperBGood1(int good, int weakFrom, int weakUntil, int d) {
             int gi = indices[good];
             for (int i = weakFrom; i < weakUntil; ++i) {
-                int wi = indices[i];
-                if (dominates(gi, wi, d)) {
-                    typeClass.add(dataCollection, gi, queryCollection, wi);
-                }
+                addIfDominates(gi, indices[i], d);
             }
         }
 
         void helperBWeak1(int goodFrom, int goodUntil, int weak, int d) {
             int wi = indices[weak];
             for (int i = goodFrom; i < goodUntil; ++i) {
-                int gi = indices[i];
-                if (dominates(gi, wi, d)) {
-                    typeClass.add(dataCollection, gi, queryCollection, wi);
-                }
+                addIfDominates(indices[i], wi, d);
             }
         }
 
@@ -427,22 +421,22 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         }
 
         // Assumes that there is no contradiction to domination in higher objectives, e.g. [maxObjective + 1; dimension)
-        boolean dominates(int goodIndex, int weakIndex, int maxObjective) {
+        void addIfDominates(int goodIndex, int weakIndex, int maxObjective) {
             // If goodIndex comes lexicographically later than weakIndex, then goodIndex cannot dominate weakIndex.
             // Equal points cannot dominate each other by definition.
-            if (lexIndices[goodIndex] >= lexIndices[weakIndex]) {
-                return false;
-            }
-            double[] goodPoint = points[goodIndex];
-            double[] weakPoint = points[weakIndex];
-            for (int i = maxObjective; i >= 0; --i) {
-                double goodValue = goodPoint[i];
-                double weakValue = weakPoint[i];
-                if (isObjectiveStrict[i] ? goodValue >= weakValue : goodValue > weakValue) {
-                    return false;
+            if (lexIndices[goodIndex] < lexIndices[weakIndex]
+                    && typeClass.targetChangesOnAdd(dataCollection, goodIndex, queryCollection, weakIndex)) {
+                double[] goodPoint = points[goodIndex];
+                double[] weakPoint = points[weakIndex];
+                for (int i = maxObjective; i >= 0; --i) {
+                    double goodValue = goodPoint[i];
+                    double weakValue = weakPoint[i];
+                    if (isObjectiveStrict[i] ? goodValue >= weakValue : goodValue > weakValue) {
+                        return;
+                    }
                 }
+                typeClass.add(dataCollection, goodIndex, queryCollection, weakIndex);
             }
-            return true;
         }
 
         void lexSort(int from, int until) {

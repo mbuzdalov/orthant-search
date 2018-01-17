@@ -73,6 +73,11 @@ public final class OrthantImplementation extends NonDominatedSorting {
         }
 
         @Override
+        public boolean targetChangesOnAdd(int[] source, int sourceIndex, int[] target, int targetIndex) {
+            return source[sourceIndex] > target[targetIndex];
+        }
+
+        @Override
         public void queryToData(int[] source, int sourceIndex, int[] target, int targetIndex) {
             target[targetIndex] += source[sourceIndex];
         }

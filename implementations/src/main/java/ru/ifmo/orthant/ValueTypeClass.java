@@ -43,6 +43,26 @@ public abstract class ValueTypeClass<T> {
     public abstract void fillWithZeroes(T collection, int from, int until);
 
     /**
+     * Checks whether {@code target[targetIndex]} may change if {@code source[sourceIndex]} is added to it.
+     *
+     * This method must be fast. Implementations may call this method to determine whether it makes sense
+     * to perform a domination check.
+     *
+     * The default implementation returns {@code true}, as it is the safest choice.
+     * It is also perfectly safe to return whether {@code source[sourceIndex]} is not a neutral element.
+     *
+     * @param source the source collection.
+     * @param sourceIndex the index of the element, which is about to be added, in the source collection.
+     * @param target the target collection.
+     * @param targetIndex the index of the element, to which it is need to add another one, in the target collection.
+     * @return {@code true} if {@code target[targetIndex]} may change if {@code source[sourceIndex]} is added to it,
+     * {@code false} otherwise.
+     */
+    public boolean targetChangesOnAdd(T source, int sourceIndex, T target, int targetIndex) {
+        return true;
+    }
+
+    /**
      * For two collections, {@code source} and {@code target} (which might be the same collection),
      * adds {@code source[sourceIndex]} to {@code target[targetIndex]}.
      * The "add" operation is the commutative composition operation {@code [M+]} of the monoid M.

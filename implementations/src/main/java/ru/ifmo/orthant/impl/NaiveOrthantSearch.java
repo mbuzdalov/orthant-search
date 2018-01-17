@@ -50,7 +50,9 @@ public final class NaiveOrthantSearch extends OrthantSearch {
                 for (int d = from; d < q; ++d) {
                     PointWrapper D = wrappers[d];
                     int di = D.index;
-                    if (isDataPoint[di] && dominates(D.point, Q.point, isObjectiveStrict)) {
+                    if (isDataPoint[di]
+                            && typeClass.targetChangesOnAdd(dataCollection, di, queryCollection, qi)
+                            && dominates(D.point, Q.point, isObjectiveStrict)) {
                         typeClass.add(dataCollection, di, queryCollection, qi);
                     }
                 }
