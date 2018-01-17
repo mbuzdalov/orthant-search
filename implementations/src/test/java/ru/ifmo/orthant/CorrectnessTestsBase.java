@@ -20,7 +20,6 @@ public abstract class CorrectnessTestsBase {
         orthantSearch.runSearch(points, dataValues, queryValues, 0, points.length,
                 isDataPoint, isQueryPoint, additionalCollection, tc, isStrict);
         Assert.assertArrayEquals(expectedQueryValues, queryValues);
-
     }
 
     @Test
