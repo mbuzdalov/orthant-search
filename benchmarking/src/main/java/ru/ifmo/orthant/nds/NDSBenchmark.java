@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.impl.NaiveOrthantSearch;
 import ru.ifmo.orthant.nds.impl.NaiveImplementation;
 import ru.ifmo.orthant.nds.impl.OrthantImplementation;
@@ -29,7 +30,7 @@ public class NDSBenchmark {
     @Param({"uniform.hypercube", "uniform.hyperplanes.f1"})
     private String datasetId;
 
-    @Param({"NaiveImplementation", "OrthantNaive"})
+    @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer"})
     private String algorithmId;
 
     @Setup
@@ -40,8 +41,15 @@ public class NDSBenchmark {
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
         switch (algorithmId) {
-            case "NaiveImplementation": sorting = new NaiveImplementation(n, d); break;
-            case "OrthantNaive": sorting = new OrthantImplementation(new NaiveOrthantSearch(n, d)); break;
+            case "NaiveImplementation":
+                sorting = new NaiveImplementation(n, d);
+                break;
+            case "OrthantNaive":
+                sorting = new OrthantImplementation(new NaiveOrthantSearch(n, d));
+                break;
+            case "OrthantDivideConquer":
+                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d));
+                break;
             default: throw new AssertionError("Algorithm ID '" + algorithmId + "' is not known");
         }
         ranks = new int[n];
