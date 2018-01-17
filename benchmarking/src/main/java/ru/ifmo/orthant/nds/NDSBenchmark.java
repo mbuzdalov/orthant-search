@@ -31,7 +31,7 @@ public class NDSBenchmark {
     private String datasetId;
 
     @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer", "OrthantDivideConquerThreshold"})
-    private String algorithmId;
+    private String usedAlgorithm;
 
     @Setup
     public void initialize() {
@@ -40,7 +40,7 @@ public class NDSBenchmark {
             case "uniform.hyperplanes.f1": instances = Instances.generateUniformHyperplanes(n, d, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
-        switch (algorithmId) {
+        switch (usedAlgorithm) {
             case "NaiveImplementation":
                 sorting = new NaiveImplementation(n, d);
                 break;
@@ -53,7 +53,7 @@ public class NDSBenchmark {
             case "OrthantDivideConquerThreshold":
                 sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true));
                 break;
-            default: throw new AssertionError("Algorithm ID '" + algorithmId + "' is not known");
+            default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }
         ranks = new int[n];
     }
