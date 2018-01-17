@@ -95,14 +95,16 @@ public final class ArrayHelper {
         while (from + 1 < until) {
             double pivot = array[(from + until) >>> 1];
             int l = from, r = until - 1;
-            while (array[l] < pivot) ++l;
-            while (array[r] > pivot) --r;
-            if (l <= r) {
-                double tmp = array[l];
-                array[l] = array[r];
-                array[r] = tmp;
-                ++l;
-                --r;
+            while (l <= r) {
+                while (array[l] < pivot) ++l;
+                while (array[r] > pivot) --r;
+                if (l <= r) {
+                    double tmp = array[l];
+                    array[l] = array[r];
+                    array[r] = tmp;
+                    ++l;
+                    --r;
+                }
             }
             if (from < r && index <= r) {
                 until = r + 1;

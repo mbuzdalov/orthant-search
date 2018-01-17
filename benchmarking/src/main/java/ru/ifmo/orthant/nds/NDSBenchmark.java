@@ -30,7 +30,7 @@ public class NDSBenchmark {
     @Param({"uniform.hypercube", "uniform.hyperplanes.f1"})
     private String datasetId;
 
-    @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer"})
+    @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer", "OrthantDivideConquerThreshold"})
     private String algorithmId;
 
     @Setup
@@ -48,7 +48,10 @@ public class NDSBenchmark {
                 sorting = new OrthantImplementation(new NaiveOrthantSearch(n, d));
                 break;
             case "OrthantDivideConquer":
-                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d));
+                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d, false));
+                break;
+            case "OrthantDivideConquerThreshold":
+                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true));
                 break;
             default: throw new AssertionError("Algorithm ID '" + algorithmId + "' is not known");
         }

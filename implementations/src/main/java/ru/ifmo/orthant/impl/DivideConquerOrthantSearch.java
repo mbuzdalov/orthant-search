@@ -12,13 +12,21 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
     private final int[] lexIndices;
     private final double[] swap;
     private final int[] integerSwap;
+    private final int[] thresholds;
 
-    public DivideConquerOrthantSearch(int maxPoints, int maxDimension) {
+    public DivideConquerOrthantSearch(int maxPoints, int maxDimension, boolean useThreshold) {
         transposedPoints = new double[maxDimension][maxPoints];
         indices = new int[maxPoints];
         lexIndices = new int[maxPoints];
         swap = new double[maxPoints];
         integerSwap = new int[maxPoints];
+        thresholds = new int[maxDimension];
+        if (useThreshold) {
+            Arrays.fill(thresholds, 100);
+            if (maxDimension > 0) thresholds[0] = 0;
+            if (maxDimension > 1) thresholds[1] = 0;
+            if (maxDimension > 2) thresholds[2] = 50;
+        }
     }
 
     @Override
@@ -63,7 +71,8 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                     points, transposedPoints, isDataPoint, isQueryPoint,
                     indices, lexIndices, swap, integerSwap,
                     dataCollection, queryCollection, additionalCollection,
-                    typeClass, isObjectiveStrict, dimension);
+                    typeClass, isObjectiveStrict, dimension,
+                    thresholds);
 
             handler.lexSort(from, until);
 
@@ -106,6 +115,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         private final ValueTypeClass<T> typeClass;
         private final boolean[] isObjectiveStrict;
         private final int dimension;
+        private final int[] thresholds;
 
         private boolean allPointsAreQueryPoints;
         private boolean allPointsAreDataPoints;
@@ -114,7 +124,8 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 double[][] points, double[][] transposedPoints, boolean[] isDataPoint, boolean[] isQueryPoint,
                 int[] indices, int[] lexIndices, double[] swap, int[] integerSwap,
                 T dataCollection, T queryCollection, T additionalCollection,
-                ValueTypeClass<T> typeClass, boolean[] isObjectiveStrict, int dimension) {
+                ValueTypeClass<T> typeClass, boolean[] isObjectiveStrict, int dimension,
+                int[] thresholds) {
             this.points = points;
             this.transposedPoints = transposedPoints;
             this.isDataPoint = isDataPoint;
@@ -129,6 +140,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             this.typeClass = typeClass;
             this.isObjectiveStrict = isObjectiveStrict;
             this.dimension = dimension;
+            this.thresholds = thresholds;
         }
 
         void solve(int from, int until) {
@@ -153,12 +165,14 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 } else if (from + 2 == until) {
                     int firstIndex = indices[from], secondIndex = indices[from + 1];
                     completePoint(firstIndex);
-                    if (isDataPoint[firstIndex] && isQueryPoint[secondIndex]) {
+                    if (lexIndices[firstIndex] != lexIndices[secondIndex] && isDataPoint[firstIndex] && isQueryPoint[secondIndex]) {
                         addIfDominates(firstIndex, secondIndex, d);
                     }
                     completePoint(secondIndex);
                 } else if (d == 1) {
                     sweepA(from, until);
+                } else if (until - from <= thresholds[d]) {
+                    hookA(from, until, d);
                 } else {
                     double[] obj = transposedPoints[d];
                     ArrayHelper.transplant(obj, indices, from, until, swap, from);
@@ -222,6 +236,8 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                     helperBWeak1(goodFrom, goodUntil, weakFrom, d);
                 } else if (d == 1) {
                     sweepB(goodFrom, goodUntil, weakFrom, weakUntil);
+                } else if (goodUntil - goodFrom + weakUntil - weakFrom <= thresholds[d]) {
+                    hookB(goodFrom, goodUntil, weakFrom, weakUntil, d);
                 } else {
                     double[] obj = transposedPoints[d];
                     boolean isStrict = isObjectiveStrict[d];
@@ -274,15 +290,50 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
 
         void helperBGood1(int good, int weakFrom, int weakUntil, int d) {
             int gi = indices[good];
-            for (int i = weakFrom; i < weakUntil; ++i) {
+            int giLex = lexIndices[gi];
+            for (int i = weakUntil - 1; i >= weakFrom; --i) {
+                int wi = indices[i];
+                if (lexIndices[wi] < giLex) {
+                    break;
+                }
                 addIfDominates(gi, indices[i], d);
             }
         }
 
         void helperBWeak1(int goodFrom, int goodUntil, int weak, int d) {
             int wi = indices[weak];
+            int wiLex = lexIndices[wi];
             for (int i = goodFrom; i < goodUntil; ++i) {
-                addIfDominates(indices[i], wi, d);
+                int gi = indices[i];
+                if (lexIndices[gi] > wiLex) {
+                    break;
+                }
+                addIfDominates(gi, wi, d);
+            }
+        }
+
+        void hookA(int from, int until, int d) {
+            for (int q = from; q < until; ++q) {
+                int qi = indices[q];
+                if (isQueryPoint[qi]) {
+                    int qiLex = lexIndices[qi];
+                    for (int v = q - 1; v >= from; --v) {
+                        int vi = indices[v];
+                        if (qiLex == lexIndices[vi]) {
+                            continue;
+                        }
+                        if (isDataPoint[vi] && typeClass.targetChangesOnAdd(dataCollection, vi, queryCollection, qi)) {
+                            addIfDominates(vi, qi, d);
+                        }
+                    }
+                    completePoint(qi);
+                }
+            }
+        }
+
+        void hookB(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int d) {
+            for (int w = weakFrom; w < weakUntil; ++w) {
+                helperBWeak1(goodFrom, goodUntil, w, d);
             }
         }
 
@@ -420,12 +471,11 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             }
         }
 
-        // Assumes that there is no contradiction to domination in higher objectives, e.g. [maxObjective + 1; dimension)
+        // Assumes that:
+        // - there is no contradiction to domination in higher objectives, e.g. [maxObjective + 1; dimension)
+        // - lexIndices[goodIndex] < lexIndices[weakIndex]
         void addIfDominates(int goodIndex, int weakIndex, int maxObjective) {
-            // If goodIndex comes lexicographically later than weakIndex, then goodIndex cannot dominate weakIndex.
-            // Equal points cannot dominate each other by definition.
-            if (lexIndices[goodIndex] < lexIndices[weakIndex]
-                    && typeClass.targetChangesOnAdd(dataCollection, goodIndex, queryCollection, weakIndex)) {
+            if (typeClass.targetChangesOnAdd(dataCollection, goodIndex, queryCollection, weakIndex)) {
                 double[] goodPoint = points[goodIndex];
                 double[] weakPoint = points[weakIndex];
                 for (int i = maxObjective; i >= 0; --i) {
