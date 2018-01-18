@@ -25,7 +25,7 @@ public class NDSBenchmark {
     private int n;
 
     @Param({"2", "3", "4", "5", "7", "10", "15", "20"})
-    private int d;
+    private int dimension;
 
     @Param({"uniform.hypercube", "uniform.hyperplane"})
     private String datasetId;
@@ -36,22 +36,22 @@ public class NDSBenchmark {
     @Setup
     public void initialize() {
         switch (datasetId) {
-            case "uniform.hypercube": instances = Instances.generateUniformHypercube(n, d); break;
-            case "uniform.hyperplane": instances = Instances.generateUniformHyperplanes(n, d, 1); break;
+            case "uniform.hypercube": instances = Instances.generateUniformHypercube(n, dimension); break;
+            case "uniform.hyperplane": instances = Instances.generateUniformHyperplanes(n, dimension, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
         switch (usedAlgorithm) {
             case "NaiveImplementation":
-                sorting = new NaiveImplementation(n, d);
+                sorting = new NaiveImplementation(n, dimension);
                 break;
             case "OrthantNaive":
-                sorting = new OrthantImplementation(new NaiveOrthantSearch(n, d));
+                sorting = new OrthantImplementation(new NaiveOrthantSearch(n, dimension));
                 break;
             case "OrthantDivideConquer":
-                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d, false));
+                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false));
                 break;
             case "OrthantDivideConquerThreshold":
-                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true));
+                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true));
                 break;
             default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }
