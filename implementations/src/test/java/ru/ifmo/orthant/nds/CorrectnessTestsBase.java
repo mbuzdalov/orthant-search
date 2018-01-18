@@ -26,11 +26,6 @@ public abstract class CorrectnessTestsBase {
         expectedOutput = expectedOutput.clone();
         BiFunction<Integer, Integer, NonDominatedSorting> factory = getFactory();
 
-        int maxExpectedOutput = 0;
-        for (int expected : expectedOutput) {
-            maxExpectedOutput = Math.max(maxExpectedOutput, expected);
-        }
-
         double[][] dupInput = new double[2 * input.length][];
         int[] dupOutput = new int[2 * expectedOutput.length];
         for (int i = 0; i < dupInput.length; ++i) {
@@ -39,6 +34,15 @@ public abstract class CorrectnessTestsBase {
         }
 
         {
+            NonDominatedSorting sorting = factory.apply(input.length, input[0].length);
+            int[] actualOutput = new int[expectedOutput.length];
+            sorting.sort(input, actualOutput);
+            Assert.assertArrayEquals(expectedOutput, actualOutput);
+            Arrays.fill(actualOutput, 2347);
+            sorting.sort(input, actualOutput);
+            Assert.assertArrayEquals(expectedOutput, actualOutput);
+        }
+        {
             NonDominatedSorting sorting = factory.apply(input.length + 71, input[0].length + 2);
             int[] actualOutput = new int[expectedOutput.length];
             sorting.sort(input, actualOutput);
@@ -46,6 +50,15 @@ public abstract class CorrectnessTestsBase {
             Arrays.fill(actualOutput, 2347);
             sorting.sort(input, actualOutput);
             Assert.assertArrayEquals(expectedOutput, actualOutput);
+        }
+        {
+            NonDominatedSorting sorting = factory.apply(dupInput.length, dupInput[0].length);
+            int[] actualOutput = new int[dupOutput.length];
+            sorting.sort(dupInput, actualOutput);
+            Assert.assertArrayEquals(dupOutput, actualOutput);
+            Arrays.fill(actualOutput, 2347);
+            sorting.sort(dupInput, actualOutput);
+            Assert.assertArrayEquals(dupOutput, actualOutput);
         }
         {
             NonDominatedSorting sorting = factory.apply(dupInput.length + 44, dupInput[0].length + 3);
