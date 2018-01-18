@@ -50,6 +50,11 @@ public abstract class OrthantSearch {
      * Third, changes based on the query result are applied to {@code dataCollection[Q]} using
      * {@link ValueTypeClass#queryToData(Object, int, Object)}.
      *
+     * As a result of execution of this method, {@code queryCollection} will contain the results of all queries.
+     * The contents of {@code dataCollection} are allowed to change in an arbitrary way.
+     * All other arrays, including {@code points} and contents of individual elements of {@code points},
+     * are left unchanged.
+     *
      * @param points the points.
      * @param dataCollection the collection for data values.
      * @param queryCollection the collection for query answers.

@@ -18,7 +18,12 @@ package ru.ifmo.orthant;
  *     </li>
  * </ul>
  *
- * @param <T> the type of the collection.
+ * The particular design of this class, based on updates of elements at given indices in "collections" of elements
+ * (rather than the actual {@code [M+]} operation on values themselves and the {@code [M0]} value)
+ * is chosen for performance reasons, since Java does not support primitive type parameters,
+ * and boxed types are too slow.
+ *
+ * @param <T> the type of the collection (typically an array of primitives).
  */
 public abstract class ValueTypeClass<T> {
     /**
