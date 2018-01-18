@@ -47,7 +47,7 @@ public final class NaiveOrthantSearch extends OrthantSearch {
             int qi = Q.index;
             if (isQueryPoint[qi]) {
                 typeClass.fillWithZeroes(queryCollection, qi, qi + 1);
-                for (int d = from; d < q; ++d) {
+                for (int d = q - 1; d >= 0; --d) {
                     PointWrapper D = wrappers[d];
                     int di = D.index;
                     if (isDataPoint[di]
