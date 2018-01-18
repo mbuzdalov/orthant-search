@@ -172,8 +172,8 @@ public abstract class CorrectnessTestsBase {
         int[] additionalCollection = tc.createCollection(orthantSearch.getAdditionalCollectionSize(orthantSearch.getMaximumPoints()));
 
         for (int t = 0; t < 300; ++t) {
-            int n = 130 + random.nextInt(50);
-            int d = 2 + random.nextInt(5);
+            int n = 30 + random.nextInt(150);
+            int d = 1 + random.nextInt(6);
             double[][] points = new double[n][d];
             if (random.nextBoolean()) {
                 for (int i = 0; i < n; ++i) {
@@ -327,8 +327,8 @@ public abstract class CorrectnessTestsBase {
         }
 
         @Override
-        public void queryToData(int[] source, int sourceIndex, int[] target, int targetIndex) {
-            target[targetIndex] += source[sourceIndex];
+        public void queryToData(int[] source, int sourceIndex, int[] target) {
+            target[sourceIndex] += source[sourceIndex];
         }
     }
 

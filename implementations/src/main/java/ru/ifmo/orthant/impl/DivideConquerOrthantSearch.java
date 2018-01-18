@@ -60,10 +60,11 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         int dimension = points[from].length;
 
         typeClass.fillWithZeroes(queryCollection, from, until);
+
         if (dimension == 0) {
             for (int i = from; i < until; ++i) {
-                if (isDataPoint[i] && isQueryPoint[i]) {
-                    typeClass.queryToData(queryCollection, i, dataCollection, i);
+                if (isQueryPoint[i]) {
+                    typeClass.queryToData(queryCollection, i, dataCollection);
                 }
             }
         } else {
@@ -89,9 +90,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                             ip = indices[++prev];
                         }
                         typeClass.add(additionalCollection, 0, queryCollection, ii);
-                        if (isDataPoint[ii]) {
-                            typeClass.queryToData(queryCollection, ii, dataCollection, ii);
-                        }
+                        typeClass.queryToData(queryCollection, ii, dataCollection);
                     }
                 }
             } else {
@@ -465,9 +464,8 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         }
 
         void completePoint(int index) {
-            // Action is needed only if it is both a data point and a query point.
-            if (isDataPoint[index] && isQueryPoint[index]) {
-                typeClass.queryToData(queryCollection, index, dataCollection, index);
+            if (isQueryPoint[index]) {
+                typeClass.queryToData(queryCollection, index, dataCollection);
             }
         }
 

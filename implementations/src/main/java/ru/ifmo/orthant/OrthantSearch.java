@@ -47,8 +47,8 @@ public abstract class OrthantSearch {
      * which is equal to composition ({@link ValueTypeClass#add(Object, int, Object, int)}) of
      * data values {@code dataCollection[P]} for all data points {@code P} such that {@code P} dominates {@code Q}.
      * Second, this value is put into query collection, as in {@code queryCollection[Q] = A}.
-     * Third, if {@code Q} is also a data point, the query result is added to {@code dataCollection[Q]} using
-     * {@link ValueTypeClass#queryToData(Object, int, Object, int)}.
+     * Third, changes based on the query result are applied to {@code dataCollection[Q]} using
+     * {@link ValueTypeClass#queryToData(Object, int, Object)}.
      *
      * @param points the points.
      * @param dataCollection the collection for data values.

@@ -56,9 +56,7 @@ public final class NaiveOrthantSearch extends OrthantSearch {
                         typeClass.add(dataCollection, di, queryCollection, qi);
                     }
                 }
-                if (isDataPoint[qi]) {
-                    typeClass.queryToData(queryCollection, qi, dataCollection, qi);
-                }
+                typeClass.queryToData(queryCollection, qi, dataCollection);
             }
         }
         for (int i = from; i < until; ++i) {

@@ -11,7 +11,10 @@ package ru.ifmo.orthant;
  *         a commutative composition operation {@code [M+]};
  *     </li>
  *     <li>
- *         an arbitrary "store-query" translation operation.
+ *         an arbitrary "query-to-data" translation operation,
+ *         called when the query result is computed for a query point,
+ *         which is allowed to affect only the query point itself if it is a data point at the same time,
+ *         or data points dominated by the query point.
  *     </li>
  * </ul>
  *
@@ -76,15 +79,23 @@ public abstract class ValueTypeClass<T> {
 
     /**
      * For two collections, {@code source} and {@code target} (which might be the same collection),
-     * stores the query result {@code source[sourceIndex]} to its final place {@code target[targetIndex]},
-     * possibly altering it.
+     * once the query result for {@code source[sourceIndex]} is completely computed,
+     * updates values associated with certain data points.
      *
+     * Implementations may safely assume that {@code source} and {@code target} are the same collections
+     * that those given to {@link OrthantSearch#runSearch(double[][], Object, Object, int, int, boolean[], boolean[], Object, ValueTypeClass, boolean[])}.
+     *
+     * Within this procedure, it is allowed to modify either {@code target[sourceIndex]},
+     * or points which are dominated by the point related to {@code sourceIndex}.
+     * Implementations of this procedure must ensure this invariant,
+     * since implementations of {@link OrthantSearch} are not able to check what this procedure does.
+     *
+     * The expected complexity of this implementation is O(1). Please do not update too many points in this procedure.
      * The value at target collection may be non-zero and may mean something.
      *
      * @param source the source collection.
      * @param sourceIndex the index of the element in the source collection, which contains raw query results.
      * @param target the target collection.
-     * @param targetIndex the index of the element in the target collection, which contains final query results..
      */
-    public abstract void queryToData(T source, int sourceIndex, T target, int targetIndex);
+    public abstract void queryToData(T source, int sourceIndex, T target);
 }
