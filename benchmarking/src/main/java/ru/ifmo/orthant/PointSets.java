@@ -1,20 +1,21 @@
-package ru.ifmo.orthant.nds;
+package ru.ifmo.orthant;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
-public final class Instances {
-    private Instances() {}
+public final class PointSets {
+    private PointSets() {}
     private static final int N_INSTANCES = 10;
 
     public static double[][][] generateUniformHypercube(int n, int d) {
         Random random = new Random(n * 63142311L + d * 55182243);
         double[][][] rv = new double[N_INSTANCES][n][d];
         for (int x = 0; x < N_INSTANCES; ++x) {
+            boolean isDiscrete = x % 2 == 0;
             for (int i = 0; i < n; ++i) {
                 for (int j = 0; j < d; ++j) {
-                    rv[x][i][j] = random.nextDouble();
+                    rv[x][i][j] = isDiscrete ? random.nextInt(10) : random.nextDouble();
                 }
             }
         }

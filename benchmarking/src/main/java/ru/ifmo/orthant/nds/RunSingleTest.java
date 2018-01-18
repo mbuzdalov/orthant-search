@@ -3,6 +3,7 @@ package ru.ifmo.orthant.nds;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
+import ru.ifmo.orthant.PointSets;
 import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.impl.NaiveOrthantSearch;
 import ru.ifmo.orthant.nds.impl.NaiveImplementation;
@@ -11,7 +12,7 @@ import ru.ifmo.orthant.nds.impl.OrthantImplementation;
 public class RunSingleTest {
     public static void main(String[] args) {
         int n = 10000, d = 6;
-        double[][][] instance = Instances.generateUniformHypercube(n, d);
+        double[][][] instance = PointSets.generateUniformHypercube(n, d);
         int[] ranks = new int[n];
 
         NonDominatedSorting[] sortings = {

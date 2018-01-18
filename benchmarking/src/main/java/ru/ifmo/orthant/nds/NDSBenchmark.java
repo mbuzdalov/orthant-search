@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import ru.ifmo.orthant.PointSets;
 import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.impl.NaiveOrthantSearch;
 import ru.ifmo.orthant.nds.impl.NaiveImplementation;
@@ -36,8 +37,8 @@ public class NDSBenchmark {
     @Setup
     public void initialize() {
         switch (datasetId) {
-            case "uniform.hypercube": instances = Instances.generateUniformHypercube(n, dimension); break;
-            case "uniform.hyperplane": instances = Instances.generateUniformHyperplanes(n, dimension, 1); break;
+            case "uniform.hypercube": instances = PointSets.generateUniformHypercube(n, dimension); break;
+            case "uniform.hyperplane": instances = PointSets.generateUniformHyperplanes(n, dimension, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
         switch (usedAlgorithm) {
