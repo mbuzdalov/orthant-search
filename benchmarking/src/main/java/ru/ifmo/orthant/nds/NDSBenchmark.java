@@ -13,21 +13,21 @@ import ru.ifmo.orthant.nds.impl.OrthantImplementation;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Timeout(time = 1, timeUnit = TimeUnit.HOURS)
-@Warmup(iterations = 5, time = 1)
+@Warmup(iterations = 2, time = 3)
 @Measurement(iterations = 1, time = 1)
-@Fork(value = 3)
+@Fork(value = 5)
 public class NDSBenchmark {
     private NonDominatedSorting sorting;
     private double[][][] instances;
     private int[] ranks;
 
-    @Param({"10", "100", "1000", "10000"})
+    @Param({"10", "31", "100", "316", "1000", "3162", "10000"})
     private int n;
 
-    @Param({"2", "3", "4", "5", "6", "7", "8", "9", "10"})
+    @Param({"2", "3", "4", "5", "7", "10", "15", "20"})
     private int d;
 
-    @Param({"uniform.hypercube", "uniform.hyperplanes.f1"})
+    @Param({"uniform.hypercube", "uniform.hyperplane"})
     private String datasetId;
 
     @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer", "OrthantDivideConquerThreshold"})
@@ -37,7 +37,7 @@ public class NDSBenchmark {
     public void initialize() {
         switch (datasetId) {
             case "uniform.hypercube": instances = Instances.generateUniformHypercube(n, d); break;
-            case "uniform.hyperplanes.f1": instances = Instances.generateUniformHyperplanes(n, d, 1); break;
+            case "uniform.hyperplane": instances = Instances.generateUniformHyperplanes(n, d, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
         switch (usedAlgorithm) {
