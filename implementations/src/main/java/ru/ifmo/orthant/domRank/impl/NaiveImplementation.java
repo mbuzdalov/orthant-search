@@ -1,12 +1,12 @@
-package ru.ifmo.orthant.domCount.impl;
+package ru.ifmo.orthant.domRank.impl;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.domCount.DominanceCount;
+import ru.ifmo.orthant.domRank.DominanceRank;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 
-public final class NaiveImplementation extends DominanceCount {
+public final class NaiveImplementation extends DominanceRank {
     private final PointWrapper[] wrappers;
     private final int maxDimension;
 
@@ -39,10 +39,11 @@ public final class NaiveImplementation extends DominanceCount {
         Arrays.sort(wrappers, 0, n);
         Arrays.fill(dominanceCounts, 0, n, 0);
         for (int i = 0; i < n; ++i) {
-            PointWrapper good = wrappers[i];
+            double[] good = wrappers[i].point;
             for (int j = i + 1; j < n; ++j) {
-                if (DominanceHelper.strictlyDominates(good.point, wrappers[j].point)) {
-                    ++good.value;
+                PointWrapper weak = wrappers[j];
+                if (DominanceHelper.strictlyDominates(good, weak.point)) {
+                    ++weak.value;
                 }
             }
         }

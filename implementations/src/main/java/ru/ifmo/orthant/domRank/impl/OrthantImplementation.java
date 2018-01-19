@@ -1,12 +1,12 @@
-package ru.ifmo.orthant.domCount.impl;
+package ru.ifmo.orthant.domRank.impl;
 
 import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.domCount.DominanceCount;
+import ru.ifmo.orthant.domRank.DominanceRank;
 
-public final class OrthantImplementation extends DominanceCount {
+public final class OrthantImplementation extends DominanceRank {
     private final OrthantSearch orthantSearch;
     private final int[] additionalCollection;
     private final int[] allOnesArray;
@@ -36,24 +36,10 @@ public final class OrthantImplementation extends DominanceCount {
     @Override
     public void evaluate(double[][] points, int[] dominanceCounts) {
         int n = points.length;
-        if (n == 0) {
-            return;
-        }
-        invertPoints(points);
         Arrays.fill(allOnesArray, 0, n, 1);
         orthantSearch.runSearch(points, allOnesArray, dominanceCounts, 0, n,
                 allTrueArray, allTrueArray, additionalCollection,
                 TYPE_CLASS_INSTANCE, allFalseArray);
-        invertPoints(points);
-    }
-
-    private static void invertPoints(double[][] points) {
-        for (double[] point : points) {
-            int d = point.length;
-            for (int i = 0; i < d; ++i) {
-                point[i] = -point[i];
-            }
-        }
     }
 
     private static final class DominanceCountTypeClass extends ValueTypeClass<int[]> {

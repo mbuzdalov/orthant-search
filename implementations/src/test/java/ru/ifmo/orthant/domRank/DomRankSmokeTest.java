@@ -1,18 +1,18 @@
-package ru.ifmo.orthant.domCount;
+package ru.ifmo.orthant.domRank;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.ifmo.orthant.domCount.impl.NaiveImplementation;
-import ru.ifmo.orthant.domCount.impl.OrthantImplementation;
+import ru.ifmo.orthant.domRank.impl.NaiveImplementation;
+import ru.ifmo.orthant.domRank.impl.OrthantImplementation;
 import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.impl.NaiveOrthantSearch;
 
-public class DomCountSmokeTest {
-    private DominanceCount[] createAlgorithms(int maxPoints, int maxDimension) {
-        return new DominanceCount[] {
+public class DomRankSmokeTest {
+    private DominanceRank[] createAlgorithms(int maxPoints, int maxDimension) {
+        return new DominanceRank[] {
                 new NaiveImplementation(maxPoints, maxDimension),
                 new OrthantImplementation(new NaiveOrthantSearch(maxPoints, maxDimension)),
                 new OrthantImplementation(new DivideConquerOrthantSearch(maxPoints, maxDimension, false)),
@@ -23,7 +23,7 @@ public class DomCountSmokeTest {
     @Test
     public void smokeTest() {
         Random random = new Random(282354312242L);
-        DominanceCount[] algorithms = createAlgorithms(180, 6);
+        DominanceRank[] algorithms = createAlgorithms(180, 6);
 
         for (int t = 0; t < 300; ++t) {
             int n = 30 + random.nextInt(150);
@@ -56,10 +56,10 @@ public class DomCountSmokeTest {
 
     @Test
     public void testTwoPoints() {
-        DominanceCount[] algorithms = createAlgorithms(2, 4);
+        DominanceRank[] algorithms = createAlgorithms(2, 4);
         double[][] points = {{ 1, 2, 3, 4 }, { 5, 6, 7, 8 }};
-        int[] expectedDominanceRanks = { 1, 0 };
-        for (DominanceCount algorithm : algorithms) {
+        int[] expectedDominanceRanks = { 0, 1 };
+        for (DominanceRank algorithm : algorithms) {
             int[] foundRanks = new int[points.length];
             algorithm.evaluate(points, foundRanks);
             Assert.assertArrayEquals(expectedDominanceRanks, foundRanks);
