@@ -8,7 +8,6 @@ import ru.ifmo.orthant.nds.NonDominatedSorting;
 
 public final class OrthantImplementation extends NonDominatedSorting {
     private final OrthantSearch orthantSearch;
-    private final RankTypeClass rankTypeClass;
     private final int[] additionalCollection;
     private final boolean[] allTrueArray;
     private final boolean[] allFalseArray;
@@ -17,8 +16,7 @@ public final class OrthantImplementation extends NonDominatedSorting {
     public OrthantImplementation(OrthantSearch orthantSearch) {
         int maxPoints = orthantSearch.getMaximumPoints();
         this.orthantSearch = orthantSearch;
-        this.rankTypeClass = new RankTypeClass();
-        this.additionalCollection = rankTypeClass.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
+        this.additionalCollection = TYPE_CLASS_INSTANCE.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
         this.queryStore = new int[maxPoints];
         this.allTrueArray = new boolean[maxPoints];
         Arrays.fill(allTrueArray, true);
@@ -41,7 +39,7 @@ public final class OrthantImplementation extends NonDominatedSorting {
         Arrays.fill(ranks, 1);
         orthantSearch.runSearch(points, ranks, queryStore,
                 0, n, allTrueArray, allTrueArray,
-                additionalCollection, rankTypeClass, allFalseArray);
+                additionalCollection, TYPE_CLASS_INSTANCE, allFalseArray);
     }
 
     /*
@@ -82,4 +80,6 @@ public final class OrthantImplementation extends NonDominatedSorting {
             target[sourceIndex] += source[sourceIndex];
         }
     }
+
+    private static final RankTypeClass TYPE_CLASS_INSTANCE = new RankTypeClass();
 }

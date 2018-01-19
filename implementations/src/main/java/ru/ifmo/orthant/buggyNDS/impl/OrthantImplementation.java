@@ -10,7 +10,6 @@ import ru.ifmo.orthant.util.PointWrapper;
 
 public final class OrthantImplementation extends BuggyNonDominatedSorting {
     private final OrthantSearch orthantSearch;
-    private final RankTypeClass rankTypeClass;
     private final int[] additionalCollection;
     private final boolean[] allTrueArray;
     private final boolean[] allFalseArray;
@@ -24,8 +23,7 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
     public OrthantImplementation(OrthantSearch orthantSearch) {
         int maxPoints = orthantSearch.getMaximumPoints();
         this.orthantSearch = orthantSearch;
-        this.rankTypeClass = new RankTypeClass();
-        this.additionalCollection = rankTypeClass.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
+        this.additionalCollection = TYPE_CLASS_INSTANCE.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
         this.queryStore = new int[maxPoints];
         this.allTrueArray = new boolean[maxPoints];
         Arrays.fill(allTrueArray, true);
@@ -73,7 +71,7 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
         // e.g. the number of equal points.
         orthantSearch.runSearch(newPoints, newRanks, queryStore,
                 0, newN, allTrueArray, allTrueArray,
-                additionalCollection, rankTypeClass, allFalseArray);
+                additionalCollection, TYPE_CLASS_INSTANCE, allFalseArray);
 
         // Third, we restore the "real" ranks using the computed references
         // AND incrementing the rank value each time we reference it.
@@ -123,4 +121,6 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
             target[sourceIndex] += source[sourceIndex];
         }
     }
+
+    private static final RankTypeClass TYPE_CLASS_INSTANCE = new RankTypeClass();
 }
