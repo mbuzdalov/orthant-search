@@ -314,14 +314,15 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         void hookA(int from, int until, int d) {
             for (int q = from; q < until; ++q) {
                 int qi = indices[q];
-                if (isQueryPoint[qi]) {
+                if (allPointsAreQueryPoints || isQueryPoint[qi]) {
                     int qiLex = lexIndices[qi];
                     for (int v = q - 1; v >= from; --v) {
                         int vi = indices[v];
                         if (qiLex == lexIndices[vi]) {
                             continue;
                         }
-                        if (isDataPoint[vi] && typeClass.targetChangesOnAdd(dataCollection, vi, queryCollection, qi)) {
+                        if ((allPointsAreDataPoints || isDataPoint[vi])
+                                && typeClass.targetChangesOnAdd(dataCollection, vi, queryCollection, qi)) {
                             addIfDominates(vi, qi, d);
                         }
                     }
@@ -347,9 +348,9 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 double[] obj0 = transposedPoints[0];
                 for (int i = from; i < until; ++i) {
                     int currIndex = indices[i];
-                    if (isQueryPoint[currIndex]) {
+                    if (allPointsAreQueryPoints || isQueryPoint[currIndex]) {
                         while (obj0[lastIndex] < obj0[currIndex]) {
-                            if (isDataPoint[lastIndex]) {
+                            if (allPointsAreDataPoints || isDataPoint[lastIndex]) {
                                 fenwickSet(fwSize, local[lastIndex], lastIndex);
                             }
                             lastIndex = indices[++last];
@@ -362,9 +363,9 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             } else {
                 for (int i = from; i < until; ++i) {
                     int currIndex = indices[i];
-                    if (isQueryPoint[currIndex]) {
+                    if (allPointsAreQueryPoints || isQueryPoint[currIndex]) {
                         while (lexIndices[lastIndex] < lexIndices[currIndex]) {
-                            if (isDataPoint[lastIndex]) {
+                            if (allPointsAreDataPoints || isDataPoint[lastIndex]) {
                                 fenwickSet(fwSize, local[lastIndex], lastIndex);
                             }
                             lastIndex = indices[++last];
@@ -464,7 +465,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         }
 
         void completePoint(int index) {
-            if (isQueryPoint[index]) {
+            if (allPointsAreQueryPoints || isQueryPoint[index]) {
                 typeClass.queryToData(queryCollection, index, dataCollection);
             }
         }
