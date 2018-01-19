@@ -11,8 +11,8 @@ import ru.ifmo.orthant.nds.impl.OrthantImplementation;
 
 public class RunSingleTest {
     public static void main(String[] args) {
-        int n = 10000, d = 6;
-        double[][][] instance = PointSets.generateUniformHypercube(n, d);
+        int n = 10000, d = 6, nInstances = 10;
+        double[][][] instance = PointSets.generateUniformHypercube(nInstances, n, d);
         int[] ranks = new int[n];
 
         NonDominatedSorting[] sortings = {

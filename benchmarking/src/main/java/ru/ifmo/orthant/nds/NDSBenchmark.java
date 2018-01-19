@@ -22,6 +22,9 @@ public class NDSBenchmark {
     private double[][][] instances;
     private int[] ranks;
 
+    @Param("10")
+    private int nInstances;
+
     @Param({"10", "31", "100", "316", "1000", "3162", "10000"})
     private int n;
 
@@ -37,8 +40,8 @@ public class NDSBenchmark {
     @Setup
     public void initialize() {
         switch (datasetId) {
-            case "uniform.hypercube": instances = PointSets.generateUniformHypercube(n, dimension); break;
-            case "uniform.hyperplane": instances = PointSets.generateUniformHyperplanes(n, dimension, 1); break;
+            case "uniform.hypercube": instances = PointSets.generateUniformHypercube(nInstances, n, dimension); break;
+            case "uniform.hyperplane": instances = PointSets.generateUniformHyperplanes(nInstances, n, dimension, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
         switch (usedAlgorithm) {

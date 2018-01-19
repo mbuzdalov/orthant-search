@@ -6,12 +6,11 @@ import java.util.Random;
 
 public final class PointSets {
     private PointSets() {}
-    private static final int N_INSTANCES = 10;
 
-    public static double[][][] generateUniformHypercube(int n, int d) {
+    public static double[][][] generateUniformHypercube(int nInstances, int n, int d) {
         Random random = new Random(n * 63142311L + d * 55182243);
-        double[][][] rv = new double[N_INSTANCES][n][d];
-        for (int x = 0; x < N_INSTANCES; ++x) {
+        double[][][] rv = new double[nInstances][n][d];
+        for (int x = 0; x < nInstances; ++x) {
             boolean isDiscrete = x % 2 == 0;
             for (int i = 0; i < n; ++i) {
                 for (int j = 0; j < d; ++j) {
@@ -22,12 +21,12 @@ public final class PointSets {
         return rv;
     }
 
-    public static double[][][] generateUniformHyperplanes(int n, int d, int f) {
+    public static double[][][] generateUniformHyperplanes(int nInstances, int n, int d, int f) {
         Random random = new Random(n * 772983252L + d * 52462563);
         int frontSize = n / f;
         int firstFrontSize = n - (f - 1) * frontSize;
-        double[][][] rv = new double[N_INSTANCES][n][d];
-        for (int x = 0; x < N_INSTANCES; ++x) {
+        double[][][] rv = new double[nInstances][n][d];
+        for (int x = 0; x < nInstances; ++x) {
             for (int i = 0; i < firstFrontSize; ++i) {
                 double sum = 1.0;
                 for (int j = d - 1; j > 0; --j) {
