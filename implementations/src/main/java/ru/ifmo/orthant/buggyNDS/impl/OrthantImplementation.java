@@ -6,6 +6,7 @@ import java.util.HashMap;
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
 import ru.ifmo.orthant.buggyNDS.BuggyNonDominatedSorting;
+import ru.ifmo.orthant.util.PointWrapper;
 
 public final class OrthantImplementation extends BuggyNonDominatedSorting {
     private final OrthantSearch orthantSearch;
@@ -15,8 +16,8 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
     private final boolean[] allFalseArray;
     private final int[] queryStore;
 
-    private final HashMap<Wrapper, Wrapper> existingWrappers;
-    private final Wrapper[] wrappers;
+    private final HashMap<PointWrapper, PointWrapper> existingWrappers;
+    private final PointWrapper[] wrappers;
     private final double[][] newPoints;
     private final int[] newRanks;
 
@@ -30,9 +31,9 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
         Arrays.fill(allTrueArray, true);
         this.allFalseArray = new boolean[orthantSearch.getMaximumDimension()];
 
-        wrappers = new Wrapper[maxPoints];
+        wrappers = new PointWrapper[maxPoints];
         for (int i = 0; i < maxPoints; ++i) {
-            wrappers[i] = new Wrapper();
+            wrappers[i] = new PointWrapper();
         }
         existingWrappers = new HashMap<>(maxPoints);
         newPoints = new double[maxPoints][];
@@ -54,10 +55,10 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
         // First, we need to leave equal points out, and to put references from "old" points to "new" points.
         int newN = 0;
         for (int i = 0; i < points.length; ++i) {
-            Wrapper current = wrappers[i];
+            PointWrapper current = wrappers[i];
             current.point = points[i];
             current.index = newN;
-            Wrapper appearing = existingWrappers.putIfAbsent(current, current);
+            PointWrapper appearing = existingWrappers.putIfAbsent(current, current);
             if (appearing == null) {
                 newRanks[ranks[i] = newN] = 1;
                 newPoints[newN++] = points[i];
@@ -81,24 +82,6 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
             ranks[i] = newRanks[referenceIndex];
             --newRanks[referenceIndex];
             wrappers[i].point = null;
-        }
-    }
-
-    private static class Wrapper {
-        double[] point;
-        int index;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Wrapper wrapper = (Wrapper) o;
-            return Arrays.equals(point, wrapper.point);
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(point);
         }
     }
 

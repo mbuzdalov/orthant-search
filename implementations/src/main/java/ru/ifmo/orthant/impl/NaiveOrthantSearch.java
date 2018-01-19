@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
+import ru.ifmo.orthant.util.ArrayHelper;
+import ru.ifmo.orthant.util.DominanceHelper;
+import ru.ifmo.orthant.util.PointWrapper;
 
 public final class NaiveOrthantSearch extends OrthantSearch {
     private final PointWrapper[] wrappers;
@@ -52,7 +55,7 @@ public final class NaiveOrthantSearch extends OrthantSearch {
                     int di = D.index;
                     if (isDataPoint[di]
                             && typeClass.targetChangesOnAdd(dataCollection, di, queryCollection, qi)
-                            && dominates(D.point, Q.point, isObjectiveStrict)) {
+                            && DominanceHelper.strictlyDominates(D.point, Q.point, isObjectiveStrict)) {
                         typeClass.add(dataCollection, di, queryCollection, qi);
                     }
                 }
@@ -61,37 +64,6 @@ public final class NaiveOrthantSearch extends OrthantSearch {
         }
         for (int i = from; i < until; ++i) {
             wrappers[i].point = null;
-        }
-    }
-
-    private static boolean dominates(double[] good, double[] weak, boolean[] isStrict) {
-        int d = good.length;
-        boolean isEqual = true;
-        for (int i = 0; i < d; ++i) {
-            double g = good[i], w = weak[i];
-            isEqual &= g == w;
-            if (isStrict[i] ? g >= w : g > w) {
-                return false;
-            }
-        }
-        return !isEqual;
-    }
-
-    private static final class PointWrapper implements Comparable<PointWrapper> {
-        double[] point;
-        int index;
-
-        @Override
-        public int compareTo(PointWrapper o) {
-            double[] l = point, r = o.point;
-            int d = l.length;
-            for (int i = 0; i < d; ++i) {
-                int cmp = Double.compare(l[i], r[i]);
-                if (cmp != 0) {
-                    return cmp;
-                }
-            }
-            return 0;
         }
     }
 }
