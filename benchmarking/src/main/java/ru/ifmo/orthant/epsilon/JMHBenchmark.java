@@ -1,12 +1,12 @@
-package ru.ifmo.orthant.buggyNDS;
+package ru.ifmo.orthant.epsilon;
 
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-import ru.ifmo.orthant.PointSets;
 import ru.ifmo.orthant.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.NaiveOrthantSearch;
+import ru.ifmo.orthant.PointSets;
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -15,10 +15,9 @@ import ru.ifmo.orthant.NaiveOrthantSearch;
 @Warmup(iterations = 2, time = 3)
 @Measurement(iterations = 1, time = 1)
 @Fork(value = 5)
-public class BuggyNDSBenchmark {
-    private BuggyNonDominatedSorting sorting;
+public class JMHBenchmark {
+    private AdditiveEpsilonIndicator algorithm;
     private double[][][] instances;
-    private int[] ranks;
 
     @Param("10")
     private int nInstances;
@@ -44,27 +43,27 @@ public class BuggyNDSBenchmark {
         }
         switch (usedAlgorithm) {
             case "NaiveImplementation":
-                sorting = new NaiveImplementation(n, dimension);
+                algorithm = new NaiveImplementation(n, dimension);
                 break;
             case "OrthantNaive":
-                sorting = new OrthantImplementation(new NaiveOrthantSearch(n, dimension));
+                algorithm = new OrthantImplementation(new NaiveOrthantSearch(n, dimension));
                 break;
             case "OrthantDivideConquer":
-                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false));
+                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false));
                 break;
             case "OrthantDivideConquerThreshold":
-                sorting = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true));
+                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true));
                 break;
             default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }
-        ranks = new int[n];
     }
 
     @Benchmark
     public void benchmark(Blackhole bh) {
-        for (double[][] dataset : instances) {
-            sorting.sort(dataset, ranks);
-            bh.consume(ranks);
+        for (int i = 0; i < instances.length; ++i) {
+            double[][] moving = instances[i];
+            double[][] fixed = instances[(i + 1) % instances.length];
+            bh.consume(algorithm.evaluate(moving, fixed));
         }
     }
 }

@@ -15,10 +15,10 @@ import ru.ifmo.orthant.NaiveOrthantSearch;
 @Warmup(iterations = 2, time = 3)
 @Measurement(iterations = 1, time = 1)
 @Fork(value = 5)
-public class DomRankBenchmark {
+public class JMHBenchmark {
     private DominanceRank algorithm;
     private double[][][] instances;
-    private int[] domCounts;
+    private int[] results;
 
     @Param("10")
     private int nInstances;
@@ -57,14 +57,14 @@ public class DomRankBenchmark {
                 break;
             default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }
-        domCounts = new int[n];
+        results = new int[n];
     }
 
     @Benchmark
     public void benchmark(Blackhole bh) {
         for (double[][] dataset : instances) {
-            algorithm.evaluate(dataset, domCounts);
-            bh.consume(domCounts);
+            algorithm.evaluate(dataset, results);
+            bh.consume(results);
         }
     }
 }
