@@ -4,7 +4,7 @@ import java.util.function.BiFunction;
 
 import ru.ifmo.orthant.impl.NaiveOrthantSearch;
 
-public class NaiveOrthantSearchTests extends CorrectnessTestsBase {
+public class OrthantSearchNaiveTests extends CorrectnessTestsBase {
     @Override
     protected BiFunction<Integer, Integer, OrthantSearch> getFactory() {
         return NaiveOrthantSearch::new;
