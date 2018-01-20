@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.nds.NonDominatedSorting;
 
 public final class OrthantImplementation extends NonDominatedSorting {
     private final OrthantSearch orthantSearch;
@@ -36,9 +35,13 @@ public final class OrthantImplementation extends NonDominatedSorting {
     @Override
     public void sort(double[][] points, int[] ranks) {
         int n = points.length;
+        if (n == 0) {
+            return;
+        }
+        int dimension = points[0].length;
         Arrays.fill(ranks, 1);
         orthantSearch.runSearch(points, ranks, queryStore,
-                0, n, allTrueArray, allTrueArray,
+                0, n, dimension, allTrueArray, allTrueArray,
                 additionalCollection, TYPE_CLASS_INSTANCE, allFalseArray);
     }
 

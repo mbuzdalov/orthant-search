@@ -17,7 +17,7 @@ public abstract class CorrectnessTestsBase {
         OrthantSearch orthantSearch = getFactory().apply(points.length, isStrict.length);
         int[] additionalCollection = tc.createCollection(orthantSearch.getAdditionalCollectionSize(orthantSearch.getMaximumPoints()));
 
-        orthantSearch.runSearch(points, dataValues, queryValues, 0, points.length,
+        orthantSearch.runSearch(points, dataValues, queryValues, 0, points.length, points[0].length,
                 isDataPoint, isQueryPoint, additionalCollection, tc, isStrict);
         Assert.assertArrayEquals(expectedQueryValues, queryValues);
     }
@@ -203,7 +203,7 @@ public abstract class CorrectnessTestsBase {
                 isStrict[i] = random.nextBoolean();
             }
 
-            orthantSearch.runSearch(points, dataValues.clone(), queryValues, 0, n,
+            orthantSearch.runSearch(points, dataValues.clone(), queryValues, 0, n, points[0].length,
                     isDataPoint, isQueryPoint, additionalCollection, tc, isStrict);
             runSearch(points, dataValues.clone(), expectedQueryValues, isDataPoint, isQueryPoint, isStrict);
             if (!Arrays.equals(expectedQueryValues, queryValues)) {

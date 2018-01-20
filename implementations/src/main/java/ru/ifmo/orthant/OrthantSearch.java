@@ -60,6 +60,7 @@ public abstract class OrthantSearch {
      * @param queryCollection the collection for query answers.
      * @param from the index of the first (inclusively) point to be processed.
      * @param until the index of the last (exclusively) point to be processed.
+     * @param dimension the number of dimensions to consider in the points.
      * @param isDataPoint {@code isDataPoint[i]} is {@code true} if {@code i} is a data point.
      * @param isQueryPoint {@code isQueryPoint[i]} is {@code true} if {@code i} is a query point.
      * @param additionalCollection the additional memory which can store data/query values.
@@ -68,7 +69,7 @@ public abstract class OrthantSearch {
      * @param <T> the type of a collection which stores data values for data points and query answers for query points.
      */
     public <T> void runSearch(
-            double[][] points, T dataCollection, T queryCollection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until, int dimension,
             boolean[] isDataPoint,
             boolean[] isQueryPoint,
             T additionalCollection,
@@ -115,12 +116,10 @@ public abstract class OrthantSearch {
             Objects.requireNonNull(points[i],
                     "Elements of the points array in the requested range must not be null");
         }
-        int dimension = points[from].length;
         for (int i = from; i < until; ++i) {
             double[] point = points[i];
-            if (dimension != point.length) {
-                throw new IllegalArgumentException("Points have different dimensions (point["
-                        + from + "] has dimension " + dimension
+            if (dimension > point.length) {
+                throw new IllegalArgumentException("Points have insufficient dimensions (required dimension " + dimension
                         + ", point[" + i + "] has dimension " + point.length);
             }
             for (int j = 0; j < dimension; ++j) {
@@ -133,12 +132,12 @@ public abstract class OrthantSearch {
             throw new IllegalArgumentException("The array isObjectiveStrict has size " + isObjectiveStrict.length
                     + ", which is too small for dimension " + dimension);
         }
-        runSearchImpl(points, dataCollection, queryCollection, from, until,
+        runSearchImpl(points, dataCollection, queryCollection, from, until, dimension,
                 isDataPoint, isQueryPoint, additionalCollection, typeClass, isObjectiveStrict);
     }
 
     protected abstract <T> void runSearchImpl(
-            double[][] points, T dataCollection, T queryCollection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until, int dimension,
             boolean[] isDataPoint,
             boolean[] isQueryPoint,
             T additionalCollection,

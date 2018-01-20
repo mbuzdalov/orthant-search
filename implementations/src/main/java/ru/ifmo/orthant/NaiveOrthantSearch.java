@@ -34,7 +34,7 @@ public final class NaiveOrthantSearch extends OrthantSearch {
 
     @Override
     protected <T> void runSearchImpl(
-            double[][] points, T dataCollection, T queryCollection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until, int dimension,
             boolean[] isDataPoint, boolean[] isQueryPoint, T additionalCollection,
             ValueTypeClass<T> typeClass, boolean[] isObjectiveStrict) {
         for (int i = from; i < until; ++i) {
@@ -52,7 +52,7 @@ public final class NaiveOrthantSearch extends OrthantSearch {
                     int di = D.index;
                     if (isDataPoint[di]
                             && typeClass.targetChangesOnAdd(dataCollection, di, queryCollection, qi)
-                            && DominanceHelper.strictlyDominates(D.point, Q.point, isObjectiveStrict)) {
+                            && DominanceHelper.strictlyDominates(D.point, Q.point, dimension, isObjectiveStrict)) {
                         typeClass.add(dataCollection, di, queryCollection, qi);
                     }
                 }

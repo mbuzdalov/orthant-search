@@ -2,7 +2,6 @@ package ru.ifmo.orthant.nds;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.nds.NonDominatedSorting;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 
@@ -31,6 +30,10 @@ public final class NaiveImplementation extends NonDominatedSorting {
     @Override
     public void sort(double[][] points, int[] ranks) {
         int n = points.length;
+        if (n == 0) {
+            return;
+        }
+        int dimension = points[0].length;
         for (int i = 0; i < n; ++i) {
             wrappers[i].index = i;
             wrappers[i].point = points[i];
@@ -42,7 +45,7 @@ public final class NaiveImplementation extends NonDominatedSorting {
             int rr = ii.value;
             for (int j = i + 1; j < n; ++j) {
                 PointWrapper jj = wrappers[j];
-                if (rr >= jj.value && DominanceHelper.strictlyDominates(ii.point, jj.point)) {
+                if (rr >= jj.value && DominanceHelper.strictlyDominates(ii.point, jj.point, dimension)) {
                     jj.value = rr + 1;
                 }
             }

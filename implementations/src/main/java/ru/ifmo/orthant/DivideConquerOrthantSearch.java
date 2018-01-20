@@ -46,7 +46,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
 
     @Override
     protected <T> void runSearchImpl(
-            double[][] points, T dataCollection, T queryCollection, int from, int until,
+            double[][] points, T dataCollection, T queryCollection, int from, int until, int dimension,
             boolean[] isDataPoint, boolean[] isQueryPoint, T additionalCollection,
             ValueTypeClass<T> typeClass, boolean[] isObjectiveStrict) {
         for (int i = from; i < until; ++i) {
@@ -55,7 +55,6 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             }
             indices[i] = i;
         }
-        int dimension = points[from].length;
 
         typeClass.fillWithZeroes(queryCollection, from, until);
 

@@ -41,7 +41,7 @@ public final class OrthantImplementation extends DominanceCount {
         }
         invertPoints(points);
         Arrays.fill(allOnesArray, 0, n, 1);
-        orthantSearch.runSearch(points, allOnesArray, dominanceCounts, 0, n,
+        orthantSearch.runSearch(points, allOnesArray, dominanceCounts, 0, n, points[0].length,
                 allTrueArray, allTrueArray, additionalCollection,
                 TYPE_CLASS_INSTANCE, allFalseArray);
         invertPoints(points);

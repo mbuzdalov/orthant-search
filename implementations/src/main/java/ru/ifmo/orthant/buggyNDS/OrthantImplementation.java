@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.buggyNDS.BuggyNonDominatedSorting;
 import ru.ifmo.orthant.util.PointWrapper;
 
 public final class OrthantImplementation extends BuggyNonDominatedSorting {
@@ -50,6 +49,10 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
 
     @Override
     public void sort(double[][] points, int[] ranks) {
+        if (points.length == 0) {
+            return;
+        }
+        int dimension = points[0].length;
         // First, we need to leave equal points out, and to put references from "old" points to "new" points.
         int newN = 0;
         for (int i = 0; i < points.length; ++i) {
@@ -70,7 +73,7 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
         // paying attention that the existing values of newRanks represent how much to add to the query result,
         // e.g. the number of equal points.
         orthantSearch.runSearch(newPoints, newRanks, queryStore,
-                0, newN, allTrueArray, allTrueArray,
+                0, newN, dimension, allTrueArray, allTrueArray,
                 additionalCollection, TYPE_CLASS_INSTANCE, allFalseArray);
 
         // Third, we restore the "real" ranks using the computed references

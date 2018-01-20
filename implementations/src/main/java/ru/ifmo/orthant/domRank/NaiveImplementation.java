@@ -31,6 +31,10 @@ public final class NaiveImplementation extends DominanceRank {
     @Override
     public void evaluate(double[][] points, int[] dominanceCounts) {
         int n = points.length;
+        if (n == 0) {
+            return;
+        }
+        int dimension = points[0].length;
         for (int i = 0; i < n; ++i) {
             wrappers[i].point = points[i];
             wrappers[i].index = i;
@@ -42,7 +46,7 @@ public final class NaiveImplementation extends DominanceRank {
             double[] good = wrappers[i].point;
             for (int j = i + 1; j < n; ++j) {
                 PointWrapper weak = wrappers[j];
-                if (DominanceHelper.strictlyDominates(good, weak.point)) {
+                if (DominanceHelper.strictlyDominates(good, weak.point, dimension)) {
                     ++weak.value;
                 }
             }

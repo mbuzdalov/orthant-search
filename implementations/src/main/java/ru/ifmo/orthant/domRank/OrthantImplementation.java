@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.domRank.DominanceRank;
 
 public final class OrthantImplementation extends DominanceRank {
     private final OrthantSearch orthantSearch;
@@ -36,8 +35,12 @@ public final class OrthantImplementation extends DominanceRank {
     @Override
     public void evaluate(double[][] points, int[] dominanceCounts) {
         int n = points.length;
+        if (n == 0) {
+            return;
+        }
+        int dimension = points[0].length;
         Arrays.fill(allOnesArray, 0, n, 1);
-        orthantSearch.runSearch(points, allOnesArray, dominanceCounts, 0, n,
+        orthantSearch.runSearch(points, allOnesArray, dominanceCounts, 0, n, dimension,
                 allTrueArray, allTrueArray, additionalCollection,
                 TYPE_CLASS_INSTANCE, allFalseArray);
     }
