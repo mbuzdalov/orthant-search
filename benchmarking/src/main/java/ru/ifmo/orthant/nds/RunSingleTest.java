@@ -4,10 +4,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
 import ru.ifmo.orthant.PointSets;
-import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
-import ru.ifmo.orthant.impl.NaiveOrthantSearch;
-import ru.ifmo.orthant.nds.impl.NaiveImplementation;
-import ru.ifmo.orthant.nds.impl.OrthantImplementation;
+import ru.ifmo.orthant.DivideConquerOrthantSearch;
+import ru.ifmo.orthant.NaiveOrthantSearch;
 
 public class RunSingleTest {
     public static void main(String[] args) {

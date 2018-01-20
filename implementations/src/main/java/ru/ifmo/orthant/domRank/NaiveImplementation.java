@@ -1,4 +1,4 @@
-package ru.ifmo.orthant.domRank.impl;
+package ru.ifmo.orthant.domRank;
 
 import java.util.Arrays;
 

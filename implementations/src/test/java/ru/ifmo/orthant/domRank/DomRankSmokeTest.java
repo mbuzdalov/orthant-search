@@ -5,10 +5,8 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.ifmo.orthant.domRank.impl.NaiveImplementation;
-import ru.ifmo.orthant.domRank.impl.OrthantImplementation;
-import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
-import ru.ifmo.orthant.impl.NaiveOrthantSearch;
+import ru.ifmo.orthant.DivideConquerOrthantSearch;
+import ru.ifmo.orthant.NaiveOrthantSearch;
 
 public class DomRankSmokeTest {
     @Test

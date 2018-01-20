@@ -1,10 +1,7 @@
-package ru.ifmo.orthant.impl;
+package ru.ifmo.orthant;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.OrthantSearch;
-import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.util.ArrayHelper;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 

@@ -1,4 +1,4 @@
-package ru.ifmo.orthant.domCount.impl;
+package ru.ifmo.orthant.domCount;
 
 import java.util.Arrays;
 

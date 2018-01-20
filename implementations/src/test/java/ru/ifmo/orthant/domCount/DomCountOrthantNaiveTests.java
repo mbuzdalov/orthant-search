@@ -2,8 +2,7 @@ package ru.ifmo.orthant.domCount;
 
 import java.util.function.BiFunction;
 
-import ru.ifmo.orthant.domCount.impl.OrthantImplementation;
-import ru.ifmo.orthant.impl.NaiveOrthantSearch;
+import ru.ifmo.orthant.NaiveOrthantSearch;
 
 public class DomCountOrthantNaiveTests extends CorrectnessTestsBase {
     @Override

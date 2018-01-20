@@ -5,10 +5,8 @@ import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import ru.ifmo.orthant.PointSets;
-import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
-import ru.ifmo.orthant.impl.NaiveOrthantSearch;
-import ru.ifmo.orthant.nds.impl.NaiveImplementation;
-import ru.ifmo.orthant.nds.impl.OrthantImplementation;
+import ru.ifmo.orthant.DivideConquerOrthantSearch;
+import ru.ifmo.orthant.NaiveOrthantSearch;
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)

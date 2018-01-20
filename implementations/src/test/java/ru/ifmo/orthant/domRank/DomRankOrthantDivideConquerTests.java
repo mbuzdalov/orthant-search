@@ -2,8 +2,7 @@ package ru.ifmo.orthant.domRank;
 
 import java.util.function.BiFunction;
 
-import ru.ifmo.orthant.domRank.impl.OrthantImplementation;
-import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
+import ru.ifmo.orthant.DivideConquerOrthantSearch;
 
 public class DomRankOrthantDivideConquerTests extends CorrectnessTestsBase {
     @Override

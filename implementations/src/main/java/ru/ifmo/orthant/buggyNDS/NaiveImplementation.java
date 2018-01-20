@@ -1,12 +1,12 @@
-package ru.ifmo.orthant.nds.impl;
+package ru.ifmo.orthant.buggyNDS;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.nds.NonDominatedSorting;
+import ru.ifmo.orthant.buggyNDS.BuggyNonDominatedSorting;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 
-public final class NaiveImplementation extends NonDominatedSorting {
+public final class NaiveImplementation extends BuggyNonDominatedSorting {
     private final PointWrapper[] wrappers;
     private final int maxDimension;
 
@@ -42,7 +42,7 @@ public final class NaiveImplementation extends NonDominatedSorting {
             int rr = ii.value;
             for (int j = i + 1; j < n; ++j) {
                 PointWrapper jj = wrappers[j];
-                if (rr >= jj.value && DominanceHelper.strictlyDominates(ii.point, jj.point)) {
+                if (rr >= jj.value && DominanceHelper.weaklyDominates(ii.point, jj.point)) {
                     jj.value = rr + 1;
                 }
             }

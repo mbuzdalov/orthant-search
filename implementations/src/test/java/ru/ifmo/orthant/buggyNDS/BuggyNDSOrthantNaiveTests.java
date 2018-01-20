@@ -2,8 +2,7 @@ package ru.ifmo.orthant.buggyNDS;
 
 import java.util.function.BiFunction;
 
-import ru.ifmo.orthant.impl.NaiveOrthantSearch;
-import ru.ifmo.orthant.buggyNDS.impl.OrthantImplementation;
+import ru.ifmo.orthant.NaiveOrthantSearch;
 
 public class BuggyNDSOrthantNaiveTests extends CorrectnessTestsBase {
     @Override

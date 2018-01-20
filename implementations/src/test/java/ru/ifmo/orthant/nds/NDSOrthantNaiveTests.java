@@ -2,9 +2,7 @@ package ru.ifmo.orthant.nds;
 
 import java.util.function.BiFunction;
 
-import ru.ifmo.orthant.impl.NaiveOrthantSearch;
-import ru.ifmo.orthant.nds.impl.NaiveImplementation;
-import ru.ifmo.orthant.nds.impl.OrthantImplementation;
+import ru.ifmo.orthant.NaiveOrthantSearch;
 
 public class NDSOrthantNaiveTests extends CorrectnessTestsBase {
     @Override

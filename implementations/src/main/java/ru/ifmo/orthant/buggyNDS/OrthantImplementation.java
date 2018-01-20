@@ -1,4 +1,4 @@
-package ru.ifmo.orthant.buggyNDS.impl;
+package ru.ifmo.orthant.buggyNDS;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,26 +1,26 @@
-package ru.ifmo.orthant.domCount.impl;
+package ru.ifmo.orthant.nds;
 
 import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.domCount.DominanceCount;
+import ru.ifmo.orthant.nds.NonDominatedSorting;
 
-public final class OrthantImplementation extends DominanceCount {
+public final class OrthantImplementation extends NonDominatedSorting {
     private final OrthantSearch orthantSearch;
     private final int[] additionalCollection;
-    private final int[] allOnesArray;
     private final boolean[] allTrueArray;
     private final boolean[] allFalseArray;
+    private final int[] queryStore;
 
     public OrthantImplementation(OrthantSearch orthantSearch) {
         int maxPoints = orthantSearch.getMaximumPoints();
         this.orthantSearch = orthantSearch;
         this.additionalCollection = TYPE_CLASS_INSTANCE.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
-        this.allOnesArray = new int[maxPoints];
+        this.queryStore = new int[maxPoints];
         this.allTrueArray = new boolean[maxPoints];
-        this.allFalseArray = new boolean[orthantSearch.getMaximumDimension()];
         Arrays.fill(allTrueArray, true);
+        this.allFalseArray = new boolean[orthantSearch.getMaximumDimension()];
     }
 
     @Override
@@ -34,29 +34,22 @@ public final class OrthantImplementation extends DominanceCount {
     }
 
     @Override
-    public void evaluate(double[][] points, int[] dominanceCounts) {
+    public void sort(double[][] points, int[] ranks) {
         int n = points.length;
-        if (n == 0) {
-            return;
-        }
-        invertPoints(points);
-        Arrays.fill(allOnesArray, 0, n, 1);
-        orthantSearch.runSearch(points, allOnesArray, dominanceCounts, 0, n,
-                allTrueArray, allTrueArray, additionalCollection,
-                TYPE_CLASS_INSTANCE, allFalseArray);
-        invertPoints(points);
+        Arrays.fill(ranks, 1);
+        orthantSearch.runSearch(points, ranks, queryStore,
+                0, n, allTrueArray, allTrueArray,
+                additionalCollection, TYPE_CLASS_INSTANCE, allFalseArray);
     }
 
-    private static void invertPoints(double[][] points) {
-        for (double[] point : points) {
-            int d = point.length;
-            for (int i = 0; i < d; ++i) {
-                point[i] = -point[i];
-            }
-        }
-    }
+    /*
+     * For non-dominated sorting, the following monoid works:
+     * - the neutral element is "-1";
+     * - the commutative composition operation is (a, b) -> Math.max(a, b).
+     * - the store-query operation is (res, old) -> res + old, and "old" is set to 1 for every query point.
+     */
 
-    private static final class DominanceCountTypeClass extends ValueTypeClass<int[]> {
+    private static class RankTypeClass extends ValueTypeClass<int[]> {
         @Override
         public int[] createCollection(int size) {
             return new int[size];
@@ -69,19 +62,24 @@ public final class OrthantImplementation extends DominanceCount {
 
         @Override
         public void fillWithZeroes(int[] collection, int from, int until) {
-            Arrays.fill(collection, from, until, 0);
+            Arrays.fill(collection, from, until, -1);
         }
 
         @Override
         public void add(int[] source, int sourceIndex, int[] target, int targetIndex) {
-            target[targetIndex] += source[sourceIndex];
+            target[targetIndex] = Math.max(target[targetIndex], source[sourceIndex]);
+        }
+
+        @Override
+        public boolean targetChangesOnAdd(int[] source, int sourceIndex, int[] target, int targetIndex) {
+            return source[sourceIndex] > target[targetIndex];
         }
 
         @Override
         public void queryToData(int[] source, int sourceIndex, int[] target) {
-            // nothing here
+            target[sourceIndex] += source[sourceIndex];
         }
     }
 
-    private static final DominanceCountTypeClass TYPE_CLASS_INSTANCE = new DominanceCountTypeClass();
+    private static final RankTypeClass TYPE_CLASS_INSTANCE = new RankTypeClass();
 }
