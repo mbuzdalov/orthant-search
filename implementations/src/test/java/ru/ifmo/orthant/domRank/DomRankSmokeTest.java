@@ -11,19 +11,15 @@ import ru.ifmo.orthant.impl.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.impl.NaiveOrthantSearch;
 
 public class DomRankSmokeTest {
-    private DominanceRank[] createAlgorithms(int maxPoints, int maxDimension) {
-        return new DominanceRank[] {
-                new NaiveImplementation(maxPoints, maxDimension),
-                new OrthantImplementation(new NaiveOrthantSearch(maxPoints, maxDimension)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(maxPoints, maxDimension, false)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(maxPoints, maxDimension, true)),
-        };
-    }
-
     @Test
     public void smokeTest() {
         Random random = new Random(282354312242L);
-        DominanceRank[] algorithms = createAlgorithms(180, 6);
+        DominanceRank[] algorithms = new DominanceRank[]{
+                new NaiveImplementation(180, 6),
+                new OrthantImplementation(new NaiveOrthantSearch(180, 6)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, false)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, true)),
+        };
 
         for (int t = 0; t < 300; ++t) {
             int n = 30 + random.nextInt(150);
@@ -51,18 +47,6 @@ public class DomRankSmokeTest {
                 algorithms[i].evaluate(points, orthantCounts);
                 Assert.assertArrayEquals(naiveCounts, orthantCounts);
             }
-        }
-    }
-
-    @Test
-    public void testTwoPoints() {
-        DominanceRank[] algorithms = createAlgorithms(2, 4);
-        double[][] points = {{ 1, 2, 3, 4 }, { 5, 6, 7, 8 }};
-        int[] expectedDominanceRanks = { 0, 1 };
-        for (DominanceRank algorithm : algorithms) {
-            int[] foundRanks = new int[points.length];
-            algorithm.evaluate(points, foundRanks);
-            Assert.assertArrayEquals(expectedDominanceRanks, foundRanks);
         }
     }
 }
