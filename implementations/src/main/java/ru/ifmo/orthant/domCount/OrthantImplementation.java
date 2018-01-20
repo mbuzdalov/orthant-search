@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import ru.ifmo.orthant.OrthantSearch;
 import ru.ifmo.orthant.ValueTypeClass;
-import ru.ifmo.orthant.domCount.DominanceCount;
 
 public final class OrthantImplementation extends DominanceCount {
     private final OrthantSearch orthantSearch;

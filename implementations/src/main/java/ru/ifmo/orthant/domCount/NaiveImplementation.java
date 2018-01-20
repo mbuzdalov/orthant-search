@@ -2,7 +2,6 @@ package ru.ifmo.orthant.domCount;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.domCount.DominanceCount;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 

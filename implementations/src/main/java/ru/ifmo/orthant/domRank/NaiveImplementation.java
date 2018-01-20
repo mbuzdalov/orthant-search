@@ -2,7 +2,6 @@ package ru.ifmo.orthant.domRank;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.domRank.DominanceRank;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 

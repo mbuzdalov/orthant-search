@@ -2,7 +2,6 @@ package ru.ifmo.orthant.buggyNDS;
 
 import java.util.Arrays;
 
-import ru.ifmo.orthant.buggyNDS.BuggyNonDominatedSorting;
 import ru.ifmo.orthant.util.DominanceHelper;
 import ru.ifmo.orthant.util.PointWrapper;
 
