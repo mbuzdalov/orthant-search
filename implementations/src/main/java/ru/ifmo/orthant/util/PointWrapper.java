@@ -1,17 +1,21 @@
 package ru.ifmo.orthant.util;
 
-import java.util.Arrays;
-
 public final class PointWrapper implements Comparable<PointWrapper> {
     public double[] point;
     public int index;
+    public int dimension = -1;
     public int value;
 
     @Override
     public int compareTo(PointWrapper o) {
+        if (dimension == -1) {
+            throw new IllegalStateException("Dimension is not specified");
+        }
+        if (dimension != o.dimension) {
+            throw new IllegalArgumentException("Cannot compare points of different dimensions");
+        }
         double[] l = point, r = o.point;
-        int d = l.length;
-        for (int i = 0; i < d; ++i) {
+        for (int i = 0; i < dimension; ++i) {
             int cmp = Double.compare(l[i], r[i]);
             if (cmp != 0) {
                 return cmp;
@@ -22,14 +26,33 @@ public final class PointWrapper implements Comparable<PointWrapper> {
 
     @Override
     public boolean equals(Object o) {
+        if (dimension == -1) {
+            throw new IllegalStateException("Dimension is not specified");
+        }
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PointWrapper that = (PointWrapper) o;
-        return Arrays.equals(point, that.point);
+        if (dimension != that.dimension) {
+            return false;
+        }
+        double[] l = point, r = that.point;
+        for (int i = 0; i < dimension; ++i) {
+            if (l[i] != r[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(point);
+        int rv = 0;
+        for (int i = 0; i < dimension; ++i) {
+            double v = point[i];
+            // Canonize a little bit
+            v = v == -0 ? +0 : v;
+            rv = 31 * rv + Double.hashCode(v);
+        }
+        return rv;
     }
 }

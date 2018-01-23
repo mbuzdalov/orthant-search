@@ -75,6 +75,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             handler.lexSort(from, until);
 
             if (dimension == 1) {
+                // isObjectiveStrict[0] does not matter here, since we have only one dimension.
                 typeClass.fillWithZeroes(additionalCollection, 0, 1);
                 for (int i = from, prev = from; i < until; ++i) {
                     int ii = indices[i];

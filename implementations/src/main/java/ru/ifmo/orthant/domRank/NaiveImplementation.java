@@ -38,6 +38,7 @@ public final class NaiveImplementation extends DominanceRank {
             wrappers[i].point = points[i];
             wrappers[i].index = i;
             wrappers[i].value = 0;
+            wrappers[i].dimension = dimension;
         }
         Arrays.sort(wrappers, 0, n);
         Arrays.fill(dominanceCounts, 0, n, 0);

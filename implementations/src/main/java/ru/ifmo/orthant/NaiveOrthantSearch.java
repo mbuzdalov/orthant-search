@@ -40,6 +40,7 @@ public final class NaiveOrthantSearch extends OrthantSearch {
         for (int i = from; i < until; ++i) {
             wrappers[i].point = points[i];
             wrappers[i].index = i;
+            wrappers[i].dimension = dimension;
         }
         Arrays.sort(wrappers, from, until);
         for (int q = from; q < until; ++q) {

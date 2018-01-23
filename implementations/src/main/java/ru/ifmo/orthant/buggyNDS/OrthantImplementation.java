@@ -59,6 +59,7 @@ public final class OrthantImplementation extends BuggyNonDominatedSorting {
             PointWrapper current = wrappers[i];
             current.point = points[i];
             current.index = newN;
+            current.dimension = dimension;
             PointWrapper appearing = existingWrappers.putIfAbsent(current, current);
             if (appearing == null) {
                 newRanks[ranks[i] = newN] = 1;
