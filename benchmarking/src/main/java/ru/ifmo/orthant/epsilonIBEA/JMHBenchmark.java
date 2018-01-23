@@ -49,13 +49,13 @@ public class JMHBenchmark {
                 algorithm = new NaiveImplementation(n, dimension, kappa);
                 break;
             case "OrthantNaive":
-                algorithm = new OrthantImplementation(new NaiveOrthantSearch(n, dimension), kappa);
+                algorithm = new OrthantImplementation(new NaiveOrthantSearch(n, dimension - 1), kappa);
                 break;
             case "OrthantDivideConquer":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false), kappa);
+                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension - 1, false), kappa);
                 break;
             case "OrthantDivideConquerThreshold":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true), kappa);
+                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension - 1, true), kappa);
                 break;
             default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }
