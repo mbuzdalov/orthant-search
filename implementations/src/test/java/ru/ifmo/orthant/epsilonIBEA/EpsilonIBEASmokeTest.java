@@ -43,9 +43,6 @@ public class EpsilonIBEASmokeTest {
 
             algorithms[0].assignFitness(points, naiveFitness);
             for (int i = 1; i < algorithms.length; ++i) {
-                if (naiveFitness[0] == -2.3360332053153585) {
-                    int bp = 0;
-                }
                 Arrays.fill(orthantFitness, 42);
                 algorithms[i].assignFitness(points, orthantFitness);
                 try {

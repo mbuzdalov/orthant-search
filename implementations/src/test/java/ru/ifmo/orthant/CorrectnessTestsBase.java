@@ -6,6 +6,7 @@ import java.util.function.BiFunction;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ru.ifmo.orthant.util.PointWrapper;
 
 public abstract class CorrectnessTestsBase {
     protected abstract BiFunction<Integer, Integer, OrthantSearch> getFactory();
@@ -281,9 +282,13 @@ public abstract class CorrectnessTestsBase {
     private static void runSearch(double[][] points, int[] dataValues, int[] queryValues,
                                   boolean[] isDataPoint, boolean[] isQueryPoint, boolean[] isStrict) {
         int n = points.length;
+        int dimension = points[0].length;
         PointWrapper[] wrappers = new PointWrapper[n];
         for (int i = 0; i < n; ++i) {
-            wrappers[i] = new PointWrapper(i, points[i]);
+            wrappers[i] = new PointWrapper();
+            wrappers[i].dimension = dimension;
+            wrappers[i].point = points[i];
+            wrappers[i].index = i;
         }
         Arrays.sort(wrappers);
         Arrays.fill(queryValues, 0);
@@ -329,29 +334,6 @@ public abstract class CorrectnessTestsBase {
         @Override
         public void queryToData(int[] source, int sourceIndex, int[] target) {
             target[sourceIndex] += source[sourceIndex];
-        }
-    }
-
-    private static class PointWrapper implements Comparable<PointWrapper> {
-        private int index;
-        private double[] point;
-
-        private PointWrapper(int index, double[] point) {
-            this.index = index;
-            this.point = point;
-        }
-
-        @Override
-        public int compareTo(PointWrapper o) {
-            double[] l = point, r = o.point;
-            int d = l.length;
-            for (int i = 0; i < d; ++i) {
-                int cmp = Double.compare(l[i], r[i]);
-                if (cmp != 0) {
-                    return cmp;
-                }
-            }
-            return 0;
         }
     }
 }

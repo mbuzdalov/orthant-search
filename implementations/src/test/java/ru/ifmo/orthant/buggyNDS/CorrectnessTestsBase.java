@@ -70,12 +70,6 @@ public abstract class CorrectnessTestsBase {
         return rv;
     }
 
-    private int[] fill(int size, int value) {
-        int[] rv = new int[size];
-        Arrays.fill(rv, value);
-        return rv;
-    }
-
     private int[][] generateHypercube(int dim, int size) {
         if (dim == 1) {
             int[][] rv = new int[size][dim];

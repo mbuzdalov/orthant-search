@@ -88,7 +88,7 @@ public abstract class ValueTypeClass<T> {
      * updates values associated with certain data points.
      *
      * Implementations may safely assume that {@code source} and {@code target} are the same collections
-     * that those given to {@link OrthantSearch#runSearch(double[][], Object, Object, int, int, boolean[], boolean[], Object, ValueTypeClass, boolean[])}.
+     * that those given to {@link OrthantSearch#runSearch(double[][], Object, Object, int, int, int, boolean[], boolean[], Object, ValueTypeClass, boolean[])}.
      *
      * Within this procedure, it is allowed to modify either {@code target[sourceIndex]},
      * or points which are dominated by the point related to {@code sourceIndex}.
