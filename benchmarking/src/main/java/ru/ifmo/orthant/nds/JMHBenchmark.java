@@ -29,7 +29,7 @@ public class JMHBenchmark {
     @Param({"2", "3", "4", "5", "7", "10", "15", "20"})
     private int dimension;
 
-    @Param({"uniform.hypercube", "uniform.hyperplane"})
+    @Param({"uniform.hypercube", "discrete.hypercube", "uniform.hyperplane"})
     private String datasetId;
 
     @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer", "OrthantDivideConquerThreshold"})
@@ -38,7 +38,8 @@ public class JMHBenchmark {
     @Setup
     public void initialize() {
         switch (datasetId) {
-            case "uniform.hypercube": instances = PointSets.generateUniformHypercube(nInstances, n, dimension); break;
+            case "uniform.hypercube":  instances = PointSets.generateUniformHypercube(nInstances, n, dimension); break;
+            case "discrete.hypercube": instances = PointSets.generateDiscreteHypercube(nInstances, n, dimension); break;
             case "uniform.hyperplane": instances = PointSets.generateUniformHyperplanes(nInstances, n, dimension, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }

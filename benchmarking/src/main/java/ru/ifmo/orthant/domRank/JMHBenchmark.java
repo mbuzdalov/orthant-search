@@ -38,7 +38,8 @@ public class JMHBenchmark {
     @Setup
     public void initialize() {
         switch (datasetId) {
-            case "uniform.hypercube": instances = PointSets.generateUniformHypercube(nInstances, n, dimension); break;
+            case "uniform.hypercube":  instances = PointSets.generateUniformHypercube(nInstances, n, dimension); break;
+            case "discrete.hypercube": instances = PointSets.generateDiscreteHypercube(nInstances, n, dimension); break;
             case "uniform.hyperplane": instances = PointSets.generateUniformHyperplanes(nInstances, n, dimension, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }

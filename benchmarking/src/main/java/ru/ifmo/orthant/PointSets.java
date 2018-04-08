@@ -11,10 +11,22 @@ public final class PointSets {
         Random random = new Random(n * 63142311L + d * 55182243);
         double[][][] rv = new double[nInstances][n][d];
         for (int x = 0; x < nInstances; ++x) {
-            boolean isDiscrete = x % 2 == 0;
             for (int i = 0; i < n; ++i) {
                 for (int j = 0; j < d; ++j) {
-                    rv[x][i][j] = isDiscrete ? random.nextInt(10) : random.nextDouble();
+                    rv[x][i][j] = random.nextDouble();
+                }
+            }
+        }
+        return rv;
+    }
+
+    public static double[][][] generateDiscreteHypercube(int nInstances, int n, int d) {
+        Random random = new Random(n * 63142311L + d * 55182243);
+        double[][][] rv = new double[nInstances][n][d];
+        for (int x = 0; x < nInstances; ++x) {
+            for (int i = 0; i < n; ++i) {
+                for (int j = 0; j < d; ++j) {
+                    rv[x][i][j] = random.nextInt(10);
                 }
             }
         }
