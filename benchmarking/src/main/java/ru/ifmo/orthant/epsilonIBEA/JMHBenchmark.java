@@ -12,7 +12,7 @@ import ru.ifmo.orthant.PointSets;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Timeout(time = 1, timeUnit = TimeUnit.HOURS)
-@Warmup(iterations = 2, time = 3)
+@Warmup(iterations = 1, time = 6)
 @Measurement(iterations = 1, time = 1)
 @Fork(value = 5)
 public class JMHBenchmark {
