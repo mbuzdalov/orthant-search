@@ -17,7 +17,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         indices = new int[maxPoints];
         lexIndices = new int[maxPoints];
         swap = new double[maxPoints];
-        integerSwap = new int[maxPoints];
+        integerSwap = new int[maxPoints * 2];
         thresholds = new int[maxDimension];
         if (useThreshold) {
             Arrays.fill(thresholds, 100);
@@ -293,7 +293,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 if (lexIndices[wi] < giLex) {
                     break;
                 }
-                addIfDominates(gi, indices[i], d);
+                addIfDominates(gi, wi, d);
             }
         }
 
@@ -348,10 +348,11 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                     int currIndex = indices[i];
                     if (allPointsAreQueryPoints || isQueryPoint[currIndex]) {
                         while (obj0[lastIndex] < obj0[currIndex]) {
+                            ++last;
                             if (allPointsAreDataPoints || isDataPoint[lastIndex]) {
                                 fenwickSet(fwSize, local[lastIndex], lastIndex);
                             }
-                            lastIndex = indices[++last];
+                            lastIndex = indices[last];
                         }
                         fenwickQuery(fwSize, local[currIndex]);
                         typeClass.add(additionalCollection, fwSize, queryCollection, currIndex);
@@ -361,12 +362,14 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             } else {
                 for (int i = from; i < until; ++i) {
                     int currIndex = indices[i];
+                    int currLex = lexIndices[currIndex];
                     if (allPointsAreQueryPoints || isQueryPoint[currIndex]) {
-                        while (lexIndices[lastIndex] < lexIndices[currIndex]) {
+                        while (lexIndices[lastIndex] < currLex) {
+                            ++last;
                             if (allPointsAreDataPoints || isDataPoint[lastIndex]) {
                                 fenwickSet(fwSize, local[lastIndex], lastIndex);
                             }
-                            lastIndex = indices[++last];
+                            lastIndex = indices[last];
                         }
                         fenwickQuery(fwSize, local[currIndex]);
                         typeClass.add(additionalCollection, fwSize, queryCollection, currIndex);
@@ -388,8 +391,9 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 for (int i = weakFrom; i < weakUntil; ++i) {
                     int currIndex = indices[i];
                     while (last < goodUntil && obj0[lastIndex] < obj0[currIndex]) {
+                        ++last;
                         fenwickSet(fwSize, local[lastIndex], lastIndex);
-                        lastIndex = indices[++last]; // this may ask for indices[goodUntil], but that's safe
+                        lastIndex = indices[last]; // this may ask for indices[goodUntil], but that's safe
                     }
                     fenwickQuery(fwSize, local[currIndex]);
                     typeClass.add(additionalCollection, fwSize, queryCollection, currIndex);
@@ -397,9 +401,11 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             } else {
                 for (int i = weakFrom; i < weakUntil; ++i) {
                     int currIndex = indices[i];
-                    while (last < goodUntil && lexIndices[lastIndex] < lexIndices[currIndex]) {
+                    int currLex = lexIndices[currIndex];
+                    while (last < goodUntil && lexIndices[lastIndex] < currLex) {
+                        ++last;
                         fenwickSet(fwSize, local[lastIndex], lastIndex);
-                        lastIndex = indices[++last]; // this may ask for indices[goodUntil], but that's safe
+                        lastIndex = indices[last]; // this may ask for indices[goodUntil], but that's safe
                     }
                     fenwickQuery(fwSize, local[currIndex]);
                     typeClass.add(additionalCollection, fwSize, queryCollection, currIndex);
@@ -527,13 +533,13 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             if (from + 1 < until) {
                 int l = from, r = until - 1;
                 double pivot = values[indices[(l + r) >>> 1]];
+                int il, ir;
                 while (l <= r) {
-                    while (values[indices[l]] < pivot) ++l;
-                    while (values[indices[r]] > pivot) --r;
+                    while (values[il = indices[l]] < pivot) ++l;
+                    while (values[ir = indices[r]] > pivot) --r;
                     if (l <= r) {
-                        int tmp = indices[l];
-                        indices[l] = indices[r];
-                        indices[r] = tmp;
+                        indices[l] = ir;
+                        indices[r] = il;
                         ++l;
                         --r;
                     }

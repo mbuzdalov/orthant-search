@@ -4,61 +4,99 @@ public final class ArrayHelper {
     private ArrayHelper() {}
 
     public static int filter(int[] indices, boolean[] condition, int from, int until, int[] temp) {
+        while (from < until && condition[indices[from]]) {
+            ++from;
+        }
         int result = from;
         int tempEnd = from;
         for (int i = from; i < until; ++i) {
             int ii = indices[i];
             if (condition[ii]) {
-                indices[result++] = ii;
+                indices[result] = ii;
+                ++result;
             } else {
-                temp[tempEnd++] = ii;
+                temp[tempEnd] = ii;
+                ++tempEnd;
             }
         }
-        System.arraycopy(temp, from, indices, result, tempEnd - from);
+        if (from < tempEnd) {
+            System.arraycopy(temp, from, indices, result, tempEnd - from);
+        }
         return result;
     }
 
     public static void merge(int[] indices, int[] lexIndices, int from, int middle, int until, int[] temp) {
+        if (middle == until) {
+            return;
+        }
+        int li = indices[from], lli = lexIndices[li];
+        int ri = indices[middle], rri = lexIndices[ri];
+        while (from < middle && lli <= rri) {
+            ++from;
+            li = indices[from];
+            lli = lexIndices[li];
+        }
+        if (from == middle) {
+            return;
+        }
         int left = from, right = middle, target = from;
-        while (left < middle && right < until) {
-            int li = indices[left], ri = indices[right];
-            if (lexIndices[li] <= lexIndices[ri]) {
+        while (true) {
+            if (lli <= rri) {
                 temp[target] = li;
                 ++left;
+                ++target;
+                if (left == middle) {
+                    break;
+                }
+                li = indices[left];
+                lli = lexIndices[li];
             } else {
                 temp[target] = ri;
                 ++right;
+                ++target;
+                if (right == until) {
+                    break;
+                }
+                ri = indices[right];
+                rri = lexIndices[ri];
             }
-            ++target;
         }
         if (left < middle) {
             System.arraycopy(indices, left, indices, right - middle + left, middle - left);
         }
-        System.arraycopy(temp, from, indices, from, target - from);
+        if (from < target) {
+            System.arraycopy(temp, from, indices, from, target - from);
+        }
     }
 
     public static long splitInThree(int[] indices, double[] values, int from, int until, double middle, int[] temp) {
+        int equalLast = from;
+        int greaterFirst = from + (until - from);
+        int greaterLast = greaterFirst;
         int lessLast = from;
-        int greaterLast = from;
-        int equalFirst = until;
         for (int i = from; i < until; ++i) {
             int ii = indices[i];
             double key = values[ii];
             if (key < middle) {
-                indices[lessLast++] = ii;
+                indices[lessLast] = ii;
+                ++lessLast;
             } else if (key > middle) {
-                temp[greaterLast++] = ii;
+                temp[greaterLast] = ii;
+                ++greaterLast;
             } else {
-                temp[--equalFirst] = ii;
+                temp[equalLast] = ii;
+                ++equalLast;
             }
         }
-        int middleStart = lessLast;
-        // This reverses the middle indices, so it's not what System.arraycopy can do.
-        for (int equalLast = until - 1; equalFirst <= equalLast; --equalLast) {
-            indices[lessLast++] = temp[equalLast];
+        if (from < equalLast) {
+            System.arraycopy(temp, from, indices, lessLast, equalLast - from);
         }
-        System.arraycopy(temp, from, indices, lessLast, greaterLast - from);
+        int middleStart = lessLast;
+        lessLast += equalLast - from;
         int greaterStart = lessLast;
+        if (greaterFirst < greaterLast) {
+            System.arraycopy(temp, greaterFirst, indices, lessLast, greaterLast - greaterFirst);
+        }
         return ((long) (middleStart) << 32) | greaterStart;
     }
 
@@ -94,24 +132,31 @@ public final class ArrayHelper {
         int index = (from + until) >>> 1;
         while (from + 1 < until) {
             double pivot = array[(from + until) >>> 1];
+            if (from + 5 < until) {
+                pivot = (pivot + array[from] + array[until - 1]) / 3;
+            }
+            double vl, vr;
             int l = from, r = until - 1;
             while (l <= r) {
-                while (array[l] < pivot) ++l;
-                while (array[r] > pivot) --r;
+                while ((vl = array[l]) < pivot) ++l;
+                while ((vr = array[r]) > pivot) --r;
                 if (l <= r) {
-                    double tmp = array[l];
-                    array[l] = array[r];
-                    array[r] = tmp;
+                    array[l] = vr;
+                    array[r] = vl;
                     ++l;
                     --r;
                 }
             }
-            if (from < r && index <= r) {
+            if (index < r) {
                 until = r + 1;
-            } else if (l + 1 < until && l <= index) {
+            } else if (l < index) {
                 from = l;
+            } else if (r == index) {
+                return max(array, from, r + 1);
+            } else if (l == index) {
+                return min(array, l, until);
             } else {
-                break;
+                return array[index];
             }
         }
         return array[index];
