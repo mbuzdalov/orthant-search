@@ -31,7 +31,7 @@ public class JMHBenchmark {
     @Param({"2", "3", "4", "5", "7", "10", "15", "20"})
     private int dimension;
 
-    @Param({"uniform.hypercube", "uniform.hyperplane"})
+    @Param({"uniform.hypercube", "discrete.hypercube", "uniform.hyperplane"})
     private String datasetId;
 
     @Param({"NaiveImplementation", "OrthantDivideConquer", "OrthantDivideConquerThreshold"})
