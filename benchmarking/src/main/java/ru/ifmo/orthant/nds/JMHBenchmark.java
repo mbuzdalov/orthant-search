@@ -7,6 +7,9 @@ import org.openjdk.jmh.infra.Blackhole;
 import ru.ifmo.orthant.PointSets;
 import ru.ifmo.orthant.DivideConquerOrthantSearch;
 import ru.ifmo.orthant.NaiveOrthantSearch;
+import ru.ifmo.orthant.nds.extra.BestOrderSort;
+import ru.ifmo.orthant.nds.extra.NonDominationTree;
+import ru.ifmo.orthant.nds.extra.JensenENSHybrid;
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -32,7 +35,8 @@ public class JMHBenchmark {
     @Param({"uniform.hypercube", "discrete.hypercube", "uniform.hyperplane"})
     private String datasetId;
 
-    @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer", "OrthantDivideConquerThreshold"})
+    @Param({"NaiveImplementation", "OrthantNaive", "OrthantDivideConquer", "OrthantDivideConquerThreshold",
+            "JensenENSHybrid", "NonDominationTree", "BestOrderSort"})
     private String usedAlgorithm;
 
     @Setup
@@ -55,6 +59,15 @@ public class JMHBenchmark {
                 break;
             case "OrthantDivideConquerThreshold":
                 algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true));
+                break;
+            case "JensenENSHybrid":
+                algorithm = new JensenENSHybrid(n, dimension);
+                break;
+            case "NonDominationTree":
+                algorithm = new NonDominationTree(n, dimension);
+                break;
+            case "BestOrderSort":
+                algorithm = new BestOrderSort(n, dimension);
                 break;
             default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }
