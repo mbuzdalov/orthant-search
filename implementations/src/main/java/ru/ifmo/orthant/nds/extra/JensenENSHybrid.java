@@ -22,7 +22,7 @@ import ru.ifmo.orthant.nds.extra.util.SplitMergeHelper;
  * The particular revision location is:
  * https://github.com/mbuzdalov/non-dominated-sorting/tree/56fcfc61f5a4009e8ed02c0c3a4b00d390ba6aff
  */
-public class HybridSorting extends NonDominatedSorting {
+public class JensenENSHybrid extends NonDominatedSorting {
     private static final int STORAGE_MULTIPLE = 5;
     private static final int THRESHOLD_3D = 100;
     private static final int THRESHOLD_ALL = 200;
@@ -46,7 +46,7 @@ public class HybridSorting extends NonDominatedSorting {
     private final RedBlackTree rankQuery;
     private final SplitMergeHelper splitMerge;
 
-    public HybridSorting(int maximumPoints, int maximumDimension) {
+    public JensenENSHybrid(int maximumPoints, int maximumDimension) {
         sorter = new DoubleArraySorter(maximumPoints);
         medianSwap = new double[maximumPoints];
         indices = new int[maximumPoints];

@@ -13,10 +13,12 @@ import ru.ifmo.orthant.nds.extra.util.SplitBuilder;
  * https://github.com/mbuzdalov/non-dominated-sorting
  * and adapted according to the needs of this repository.
  *
+ * The particular name of the class in that repository was: ru.ifmo.nds.ndt.ENS_NDT_Arrays.
+ *
  * The particular revision location is:
  * https://github.com/mbuzdalov/non-dominated-sorting/tree/56fcfc61f5a4009e8ed02c0c3a4b00d390ba6aff
  */
-public class ENS_NDT extends NonDominatedSorting {
+public class NonDominationTree extends NonDominatedSorting {
     private DoubleArraySorter sorter;
     private SplitBuilder splitBuilder;
     private int[] indices;
@@ -27,7 +29,7 @@ public class ENS_NDT extends NonDominatedSorting {
     private int[] nodeArray;
     private int nNodes;
 
-    public ENS_NDT(int maximumPoints, int maximumDimension) {
+    public NonDominationTree(int maximumPoints, int maximumDimension) {
         this.sorter = new DoubleArraySorter(maximumPoints);
         this.splitBuilder = new SplitBuilder(maximumPoints);
         this.indices = new int[maximumPoints];

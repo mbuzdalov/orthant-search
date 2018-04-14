@@ -11,6 +11,8 @@ import ru.ifmo.orthant.nds.extra.util.DoubleArraySorter;
  * https://github.com/mbuzdalov/non-dominated-sorting
  * and adapted according to the needs of this repository.
  *
+ * The particular name of the class in that repository was: ru.ifmo.nds.bos.Improved.
+ *
  * The particular revision location is:
  * https://github.com/mbuzdalov/non-dominated-sorting/tree/56fcfc61f5a4009e8ed02c0c3a4b00d390ba6aff
  */
