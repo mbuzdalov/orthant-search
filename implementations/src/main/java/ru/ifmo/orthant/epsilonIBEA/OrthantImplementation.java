@@ -25,14 +25,14 @@ public final class OrthantImplementation extends EpsilonIBEAFitnessAssignment {
     public OrthantImplementation(OrthantSearch orthantSearch, double kappa) {
         this.orthantSearch = orthantSearch;
         this.kappa = kappa;
-        int maxPoints = getMaximumPoints();
-        int maxDimension = getMaximumDimension();
-        internalPoints = new double[maxPoints][maxDimension - 1];
+        int maxPoints = orthantSearch.getMaximumPoints();
+        int maxDimension = orthantSearch.getMaximumDimension();
+        internalPoints = new double[maxPoints][maxDimension];
         dataValues = new double[maxPoints];
         compressedDataValues = new double[maxPoints];
         queryValues = new double[maxPoints];
         reindex = new int[maxPoints];
-        isObjectiveStrict = new boolean[maxDimension - 1];
+        isObjectiveStrict = new boolean[maxDimension];
         additionalCollection = TYPE_CLASS_INSTANCE.createCollection(orthantSearch.getAdditionalCollectionSize(maxPoints));
 
         allTrue = new boolean[maxPoints];
