@@ -14,6 +14,8 @@ public abstract class CorrectnessTestsBase {
         double[][] points = {{ 1, 2, 3, 4 }, { 5, 6, 7, 8 }};
         int[] expectedDominanceRanks = { 0, 1 };
         int[] foundRanks = new int[points.length];
+        Assert.assertTrue(points.length <= algorithm.getMaximumPoints());
+        Assert.assertTrue(points[0].length <= algorithm.getMaximumDimension());
         algorithm.evaluate(points, foundRanks);
         Assert.assertArrayEquals(expectedDominanceRanks, foundRanks);
     }

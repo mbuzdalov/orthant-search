@@ -10,6 +10,10 @@ public abstract class CorrectnessTestsBase {
 
     private double runEpsilon(double[][] moving, double[][] fixed) {
         AdditiveEpsilonIndicator algorithm = getFactory().apply(Math.max(moving.length, fixed.length), moving[0].length);
+        Assert.assertTrue(moving.length <= algorithm.getMaximumSetSize());
+        Assert.assertTrue(fixed.length <= algorithm.getMaximumSetSize());
+        Assert.assertTrue(moving[0].length <= algorithm.getMaximumDimension());
+        Assert.assertTrue(fixed[0].length <= algorithm.getMaximumDimension());
         return algorithm.evaluate(moving, fixed);
     }
 

@@ -12,6 +12,8 @@ public abstract class CorrectnessTestsBase {
         double[][] points = {{ 1, 2, 3, 4 }};
         double[] expectedFitness = { 0 };
         double[] foundFitness = new double[points.length];
+        Assert.assertTrue(points.length <= algorithm.getMaximumPoints());
+        Assert.assertTrue(points[0].length <= algorithm.getMaximumDimension());
         algorithm.assignFitness(points, foundFitness);
         Assert.assertArrayEquals(expectedFitness, foundFitness, 1e-9);
     }
@@ -22,6 +24,8 @@ public abstract class CorrectnessTestsBase {
         double[][] points = {{ 1, 2, 3, 4 }, { 1, 2, 3, 4 }};
         double[] expectedFitness = { -1, -1 };
         double[] foundFitness = new double[points.length];
+        Assert.assertTrue(points.length <= algorithm.getMaximumPoints());
+        Assert.assertTrue(points[0].length <= algorithm.getMaximumDimension());
         algorithm.assignFitness(points, foundFitness);
         Assert.assertArrayEquals(expectedFitness, foundFitness, 1e-9);
     }
@@ -34,6 +38,8 @@ public abstract class CorrectnessTestsBase {
         double[][] points = {{ 1, 2 }, { 2, 1 }};
         double[] expectedFitness = { expectedFitnessValue, expectedFitnessValue };
         double[] foundFitness = new double[points.length];
+        Assert.assertTrue(points.length <= algorithm.getMaximumPoints());
+        Assert.assertTrue(points[0].length <= algorithm.getMaximumDimension());
         algorithm.assignFitness(points, foundFitness);
         Assert.assertArrayEquals(expectedFitness, foundFitness, 1e-9);
     }
@@ -45,6 +51,8 @@ public abstract class CorrectnessTestsBase {
         double[][] points = {{ 1, 1 }, { 2, 2 }};
         double[] expectedFitness = { -Math.exp(-1 / kappa), -Math.exp(1 / kappa) };
         double[] foundFitness = new double[points.length];
+        Assert.assertTrue(points.length <= algorithm.getMaximumPoints());
+        Assert.assertTrue(points[0].length <= algorithm.getMaximumDimension());
         algorithm.assignFitness(points, foundFitness);
         Assert.assertArrayEquals(expectedFitness, foundFitness, 1e-9);
     }
@@ -63,6 +71,8 @@ public abstract class CorrectnessTestsBase {
         double kappa = 1.2345;
         double[] foundFitness = new double[expectedFitness.length];
         EpsilonIBEAFitnessAssignment algorithm = getAlgorithm(points.length, points[0].length, kappa);
+        Assert.assertTrue(points.length <= algorithm.getMaximumPoints());
+        Assert.assertTrue(points[0].length <= algorithm.getMaximumDimension());
         algorithm.assignFitness(points, foundFitness);
         Assert.assertArrayEquals(expectedFitness, foundFitness, 1e-9);
     }
