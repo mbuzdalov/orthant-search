@@ -1,17 +1,17 @@
 package ru.ifmo.orthant.epsilon;
 
 public final class NaiveImplementation extends AdditiveEpsilonIndicator {
-    private final int maximumPoints;
+    private final int maximumSetSize;
     private final int maximumDimension;
 
-    public NaiveImplementation(int maximumPoints, int maximumDimension) {
-        this.maximumPoints = maximumPoints;
+    public NaiveImplementation(int maximumSetSize, int maximumDimension) {
+        this.maximumSetSize = maximumSetSize;
         this.maximumDimension = maximumDimension;
     }
 
     @Override
     public int getMaximumSetSize() {
-        return maximumPoints;
+        return maximumSetSize;
     }
 
     @Override
