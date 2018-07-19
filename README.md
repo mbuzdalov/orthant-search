@@ -16,6 +16,7 @@ The following reductions to orthant search are implemented and tested:
 * A "buggy" version of non-dominated sorting that assigns increasing ranks to several identical solutions.
 * The additive binary epsilon-indicator (used mainly in assessing the performance of multiobjective optimization algorithms).
 * Initial fitness assignment for the IBEA algorithm (the version that uses the additive binary epsilon-indicator).
+* NEW: the R2 indicator, including the very recent version with an arbitrary power (typically equal to the dimension) applied to the addends.
 
 ## Acknowledgments
 
