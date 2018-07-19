@@ -20,9 +20,9 @@ public class R2SmokeTest {
         };
 
         for (int t = 0; t < 300; ++t) {
-            int m = 5 + random.nextInt(2);
-            int f = 5 + random.nextInt(2);
-            int d = 1 + random.nextInt(2);
+            int m = 5 + random.nextInt(150);
+            int f = 5 + random.nextInt(150);
+            int d = 1 + random.nextInt(6);
             double[][] referenceVectors = new double[m][d];
             double[][] population = new double[f][d];
             double[] referencePoint = new double[d];

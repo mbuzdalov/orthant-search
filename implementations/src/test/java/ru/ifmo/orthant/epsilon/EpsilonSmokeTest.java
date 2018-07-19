@@ -19,9 +19,9 @@ public class EpsilonSmokeTest {
         };
 
         for (int t = 0; t < 300; ++t) {
-            int m = 5 + random.nextInt(2);
-            int f = 5 + random.nextInt(2);
-            int d = 1 + random.nextInt(2);
+            int m = 5 + random.nextInt(150);
+            int f = 5 + random.nextInt(150);
+            int d = 1 + random.nextInt(6);
             double[][] moving = new double[m][d];
             double[][] fixed = new double[f][d];
             if (random.nextBoolean()) {
