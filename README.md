@@ -21,6 +21,6 @@ The following reductions to orthant search are implemented and tested:
 ## Acknowledgments
 
 The following contributors would like to acknowledge the support of this research by the [Russian Scientific Foundation](http://рнф.рф/en),
-agreement [17-71-20178](http://рнф.рф/en/enprjcard?rid=17-71-20178):
+agreement [17-71-20178](http://рнф.рф/en/enprjcard/?rid=17-71-20178):
 
 * [Maxim Buzdalov](https://github.com/mbuzdalov)
