@@ -186,7 +186,7 @@ public final class JensenENSHybrid extends NonDominatedSorting {
 
     private boolean helperAHook(int from, int until, int obj) {
         int size = until - from;
-        if (obj == 2 && size < THRESHOLD_3D || obj > 2 && size < THRESHOLD_ALL) {
+        if (obj == 2 && size > THRESHOLD_3D || obj > 2 && size > THRESHOLD_ALL) {
             return false;
         }
 
@@ -353,7 +353,7 @@ public final class JensenENSHybrid extends NonDominatedSorting {
         }
         int goodSize = goodUntil - goodFrom;
         int problemSize = goodSize + weakUntil - weakFrom;
-        if (obj == 2 && problemSize < THRESHOLD_3D || obj > 2 && problemSize < THRESHOLD_ALL) {
+        if (obj == 2 && problemSize > THRESHOLD_3D || obj > 2 && problemSize > THRESHOLD_ALL) {
             return false;
         }
 
