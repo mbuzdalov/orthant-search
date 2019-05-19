@@ -3,10 +3,11 @@ package ru.ifmo.orthant.nds.extra;
 import java.util.Arrays;
 
 import ru.ifmo.orthant.nds.NonDominatedSorting;
-import ru.ifmo.orthant.nds.extra.util.ArrayHelper;
-import ru.ifmo.orthant.nds.extra.util.DoubleArraySorter;
 import ru.ifmo.orthant.nds.extra.util.Split;
 import ru.ifmo.orthant.nds.extra.util.SplitBuilder;
+
+import ru.ifmo.orthant.util.ArrayHelper;
+import ru.ifmo.orthant.util.ArraySorter;
 
 /**
  * This class was imported from the following GitHub repository:
@@ -19,7 +20,7 @@ import ru.ifmo.orthant.nds.extra.util.SplitBuilder;
  * https://github.com/mbuzdalov/non-dominated-sorting/tree/56fcfc61f5a4009e8ed02c0c3a4b00d390ba6aff
  */
 public class NonDominationTree extends NonDominatedSorting {
-    private DoubleArraySorter sorter;
+    private ArraySorter sorter;
     private SplitBuilder splitBuilder;
     private int[] indices;
     private int[] ranks;
@@ -30,12 +31,12 @@ public class NonDominationTree extends NonDominatedSorting {
     private int nNodes;
 
     public NonDominationTree(int maximumPoints, int maximumDimension) {
-        this.sorter = new DoubleArraySorter(maximumPoints);
-        this.splitBuilder = new SplitBuilder(maximumPoints);
+        this.sorter = new ArraySorter(maximumPoints);
         this.indices = new int[maximumPoints];
         this.ranks = new int[maximumPoints];
         this.transposedPoints = new double[maximumDimension][maximumPoints];
         this.points = new double[maximumPoints][];
+        this.splitBuilder = new SplitBuilder(transposedPoints, maximumPoints, 2);
 
         // We need to have:
         // - N nodes for roots of layers
@@ -157,7 +158,7 @@ public class NonDominationTree extends NonDominatedSorting {
             return;
         }
 
-        int newN = DoubleArraySorter.retainUniquePoints(points, indices, this.points, ranks);
+        int newN = ArraySorter.retainUniquePoints(points, indices, this.points, ranks);
         Arrays.fill(this.ranks, 0, newN, 0);
         Arrays.fill(this.nodeArray, 0, 2 * newN, 0);
 
@@ -167,7 +168,7 @@ public class NonDominationTree extends NonDominatedSorting {
             }
         }
 
-        Split split = splitBuilder.result(transposedPoints, newN, dim, 2);
+        Split split = splitBuilder.result(newN, dim);
 
         int maxRank = 1;
         nNodes = newN;

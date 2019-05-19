@@ -1,26 +1,20 @@
 package ru.ifmo.orthant.nds.extra;
 
 import java.util.Arrays;
+import java.util.concurrent.ForkJoinTask;
 
 import ru.ifmo.orthant.nds.NonDominatedSorting;
-import ru.ifmo.orthant.nds.extra.util.ArrayHelper;
-import ru.ifmo.orthant.nds.extra.util.DoubleArraySorter;
 import ru.ifmo.orthant.nds.extra.util.RedBlackTree;
-import ru.ifmo.orthant.nds.extra.util.SplitMergeHelper;
+
+import ru.ifmo.orthant.util.ArrayHelper;
+import ru.ifmo.orthant.util.ArraySorter;
+import ru.ifmo.orthant.util.DominanceHelper;
+import ru.ifmo.orthant.util.SplitMergeHelper;
 
 /**
- * This class was imported from the following GitHub repository:
+ * This class was imported from several locations of the following GitHub repository:
  * https://github.com/mbuzdalov/non-dominated-sorting
  * and adapted according to the needs of this repository.
- *
- * This particular class is a result of merge of the following two classes:
- * <ul>
- *     <li>ru.ifmo.nds.jfb.AbstractJFBSorting</li>
- *     <li>ru.ifmo.nds.jfb.RedBlackTreeSweepHybridENS</li>
- * </ul>
- *
- * The particular revision location is:
- * https://github.com/mbuzdalov/non-dominated-sorting/tree/56fcfc61f5a4009e8ed02c0c3a4b00d390ba6aff
  */
 public class JensenENSHybrid extends NonDominatedSorting {
     private static final int STORAGE_MULTIPLE = 5;
@@ -37,7 +31,7 @@ public class JensenENSHybrid extends NonDominatedSorting {
     private final double[][] transposedPoints;
 
     // This is used in preparation phase or in 2D-only sweep.
-    private final DoubleArraySorter sorter;
+    private final ArraySorter sorter;
     private final int[] internalIndices;
     private final double[] lastFrontOrdinates;
 
@@ -47,7 +41,7 @@ public class JensenENSHybrid extends NonDominatedSorting {
     private final SplitMergeHelper splitMerge;
 
     public JensenENSHybrid(int maximumPoints, int maximumDimension) {
-        sorter = new DoubleArraySorter(maximumPoints);
+        sorter = new ArraySorter(maximumPoints);
         medianSwap = new double[maximumPoints];
         indices = new int[maximumPoints];
         ranks = new int[maximumPoints];
@@ -97,7 +91,7 @@ public class JensenENSHybrid extends NonDominatedSorting {
         } else {
             // 3: General case.
             // 3.1: Moving points in a sorted order to internal structures
-            final int newN = DoubleArraySorter.retainUniquePoints(points, internalIndices, this.points, ranks);
+            final int newN = ArraySorter.retainUniquePoints(points, internalIndices, this.points, ranks);
             Arrays.fill(this.ranks, 0, newN, 0);
             ArrayHelper.fillIdentity(this.indices, newN);
 
@@ -166,14 +160,6 @@ public class JensenENSHybrid extends NonDominatedSorting {
         }
     }
 
-    private boolean helperAHookCondition(int size, int obj) {
-        switch (obj) {
-            case 1: return false;
-            case 2: return size < THRESHOLD_3D;
-            default: return size < THRESHOLD_ALL;
-        }
-    }
-
     private boolean checkIfDominatesA(int sliceIndex, int obj, int weakIndex) {
         int sliceRank = space[sliceIndex];
         if (ranks[weakIndex] > sliceRank) {
@@ -200,9 +186,14 @@ public class JensenENSHybrid extends NonDominatedSorting {
         }
     }
 
-    private void helperAHook(int from, int until, int obj) {
+    private boolean helperAHook(int from, int until, int obj) {
+        int size = until - from;
+        if (obj == 2 && size < THRESHOLD_3D || obj > 2 && size < THRESHOLD_ALL) {
+            return false;
+        }
+
         int sliceOffset = from * STORAGE_MULTIPLE;
-        int pointOffset = sliceOffset + 3 * (until - from);
+        int pointOffset = sliceOffset + 3 * size;
 
         int sliceCurrent = sliceOffset - 3;
         int sliceFirst = -1;
@@ -240,30 +231,7 @@ public class JensenENSHybrid extends NonDominatedSorting {
                 pointIndex += 2;
             }
         }
-    }
-
-    private void helperAMain(int from, int until, int obj) {
-        ArrayHelper.transplant(transposedPoints[obj], indices, from, until, medianSwap, from);
-        double objMin = ArrayHelper.min(medianSwap, from, until);
-        double objMax = ArrayHelper.max(medianSwap, from, until);
-        if (objMin == objMax) {
-            helperA(from, until, obj - 1);
-        } else {
-            double median = ArrayHelper.destructiveMedian(medianSwap, from, until);
-            long split = splitMerge.splitInThree(transposedPoints[obj], indices,
-                    from, from, until, median, objMin, objMax);
-            int startMid = SplitMergeHelper.extractMid(split);
-            int startRight = SplitMergeHelper.extractRight(split);
-
-            helperA(from, startMid, obj);
-            helperB(from, startMid, startMid, startRight, obj - 1, from);
-            helperA(startMid, startRight, obj - 1);
-            helperB(from, startMid, startRight, until, obj - 1, from);
-            helperB(startMid, startRight, startRight, until, obj - 1, from);
-            helperA(startRight, until, obj);
-
-            splitMerge.mergeThree(indices, from, from, startMid, startMid, startRight, startRight, until);
-        }
+        return true;
     }
 
     private void ifDominatesUpdateRank(int good, int weak, int obj) {
@@ -278,14 +246,38 @@ public class JensenENSHybrid extends NonDominatedSorting {
             if (n == 2) {
                 int goodIndex = indices[from];
                 int weakIndex = indices[from + 1];
-                ifDominatesUpdateRank(goodIndex, weakIndex, obj);
+                int goodRank = ranks[goodIndex];
+                if (ranks[weakIndex] <= goodRank && DominanceHelper.strictlyDominatesAssumingLexicographicallySmaller(points[goodIndex], points[weakIndex], obj)) {
+                    ranks[weakIndex] = 1 + goodRank;
+                }
             }
-        } else if (obj == 1) {
-            sweepA(from, until);
-        } else if (helperAHookCondition(until - from, obj)) {
-            helperAHook(from, until, obj);
         } else {
-            helperAMain(from, until, obj);
+            while (obj > 1) {
+                if (helperAHook(from, until, obj)) {
+                    return;
+                }
+                if (ArrayHelper.transplantAndCheckIfSame(transposedPoints[obj], indices, from, until, medianSwap, from)) {
+                    --obj;
+                } else {
+                    double median = ArrayHelper.destructiveMedian(medianSwap, from, until);
+                    long split = splitMerge.splitInThree(transposedPoints[obj], indices, from, from, until, median);
+                    int startMid = SplitMergeHelper.extractMid(split);
+                    int startRight = SplitMergeHelper.extractRight(split);
+
+                    helperA(from, startMid, obj);
+                    --obj;
+                    helperB(from, startMid, startMid, startRight, obj, from);
+                    helperA(startMid, startRight, obj);
+                    helperB(from, startMid, startRight, until, obj, from);
+                    helperB(startMid, startRight, startRight, until, obj, from);
+                    ++obj;
+                    helperA(startRight, until, obj);
+
+                    splitMerge.mergeThree(indices, from, from, startMid, startMid, startRight, startRight, until);
+                    return;
+                }
+            }
+            sweepA(from, until);
         }
     }
 
@@ -307,15 +299,6 @@ public class JensenENSHybrid extends NonDominatedSorting {
         for (int i = goodFrom; i < goodUntil; ++i) {
             int gi = indices[i];
             ifDominatesUpdateRank(gi, wi, obj);
-        }
-    }
-
-    private boolean helperBHookCondition(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int obj) {
-        int size = goodUntil - goodFrom + weakUntil - weakFrom;
-        switch (obj) {
-            case 1: return false;
-            case 2: return size < THRESHOLD_3D;
-            default: return size < THRESHOLD_ALL;
         }
     }
 
@@ -366,11 +349,15 @@ public class JensenENSHybrid extends NonDominatedSorting {
         }
     }
 
-    private void helperBHook(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int obj, int tempFrom) {
+    private boolean helperBHook(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int obj, int tempFrom) {
         if (goodFrom == goodUntil || weakFrom == weakUntil) {
-            return;
+            return true;
         }
         int goodSize = goodUntil - goodFrom;
+        int problemSize = goodSize + weakUntil - weakFrom;
+        if (obj == 2 && problemSize < THRESHOLD_3D || obj > 2 && problemSize < THRESHOLD_ALL) {
+            return false;
+        }
 
         int sortedIndicesOffset = tempFrom * STORAGE_MULTIPLE;
         int ranksAndSlicesOffset = sortedIndicesOffset + goodSize;
@@ -446,55 +433,13 @@ public class JensenENSHybrid extends NonDominatedSorting {
                 ranks[wi] = weakRank;
             }
         }
-    }
-
-    private void helperBMain(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int obj, int tempFrom) {
-        double[] currentTransposed = transposedPoints[obj];
-        int medianGood = ArrayHelper.transplant(currentTransposed, indices, goodFrom, goodUntil, medianSwap, tempFrom);
-        double goodMinObj = ArrayHelper.min(medianSwap, tempFrom, medianGood);
-        int medianWeak = ArrayHelper.transplant(currentTransposed, indices, weakFrom, weakUntil, medianSwap, medianGood);
-        double weakMaxObj = ArrayHelper.max(medianSwap, medianGood, medianWeak);
-        if (weakMaxObj < goodMinObj) {
-            return;
-        }
-        double goodMaxObj = ArrayHelper.max(medianSwap, tempFrom, medianGood);
-        double weakMinObj = ArrayHelper.min(medianSwap, medianGood, medianWeak);
-        if (goodMaxObj <= weakMinObj) {
-            helperB(goodFrom, goodUntil, weakFrom, weakUntil, obj - 1, tempFrom);
-            return;
-        }
-        double median = ArrayHelper.destructiveMedian(medianSwap, tempFrom, medianWeak);
-        long goodSplit = splitMerge.splitInThree(currentTransposed, indices, tempFrom, goodFrom, goodUntil, median, goodMinObj, goodMaxObj);
-        int goodMidL = SplitMergeHelper.extractMid(goodSplit);
-        int goodMidR = SplitMergeHelper.extractRight(goodSplit);
-        long weakSplit = splitMerge.splitInThree(currentTransposed, indices, tempFrom, weakFrom, weakUntil, median, weakMinObj, weakMaxObj);
-        int weakMidL = SplitMergeHelper.extractMid(weakSplit);
-        int weakMidR = SplitMergeHelper.extractRight(weakSplit);
-        int tempMid = tempFrom + ((goodUntil - goodFrom + weakUntil - weakFrom) >>> 1);
-
-        helperB(goodFrom, goodMidL, weakMidR, weakUntil, obj - 1, tempFrom);
-        helperB(goodMidL, goodMidR, weakMidR, weakUntil, obj - 1, tempFrom);
-
-        helperB(goodFrom, goodMidL, weakMidL, weakMidR, obj - 1, tempFrom);
-        helperB(goodMidL, goodMidR, weakMidL, weakMidR, obj - 1, tempFrom);
-
-        helperB(goodMidR, goodUntil, weakMidR, weakUntil, obj, tempMid);
-        helperB(goodFrom, goodMidL, weakFrom, weakMidL, obj, tempFrom);
-
-        splitMerge.mergeThree(indices, tempFrom, goodFrom, goodMidL, goodMidL, goodMidR, goodMidR, goodUntil);
-        splitMerge.mergeThree(indices, tempFrom, weakFrom, weakMidL, weakMidL, weakMidR, weakMidR, weakUntil);
+        return true;
     }
 
     private void helperB(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int obj, int tempFrom) {
         if (goodUntil - goodFrom > 0 && weakUntil - weakFrom > 0) {
-            int lastWeakIdx = indices[weakUntil - 1];
-            while (goodFrom < goodUntil && indices[goodUntil - 1] > lastWeakIdx) {
-                --goodUntil;
-            }
-            int firstGoodIdx = indices[goodFrom];
-            while (weakFrom < weakUntil && indices[weakFrom] < firstGoodIdx) {
-                ++weakFrom;
-            }
+            goodUntil = ArrayHelper.findLastWhereNotGreater(indices, goodFrom, goodUntil, indices[weakUntil - 1]);
+            weakFrom = ArrayHelper.findWhereNotSmaller(indices, weakFrom, weakUntil, indices[goodFrom]);
         }
         int goodN = goodUntil - goodFrom;
         int weakN = weakUntil - weakFrom;
@@ -503,12 +448,54 @@ public class JensenENSHybrid extends NonDominatedSorting {
                 updateByPoint(indices[goodFrom], weakFrom, weakUntil, obj);
             } else if (weakN == 1) {
                 helperBWeak1(goodFrom, goodUntil, weakFrom, obj);
-            } else if (obj == 1) {
-                sweepB(goodFrom, goodUntil, weakFrom, weakUntil, tempFrom);
-            } else if (helperBHookCondition(goodFrom, goodUntil, weakFrom, weakUntil, obj)) {
-                helperBHook(goodFrom, goodUntil, weakFrom, weakUntil, obj, tempFrom);
             } else {
-                helperBMain(goodFrom, goodUntil, weakFrom, weakUntil, obj, tempFrom);
+                while (obj > 1) {
+                    if (helperBHook(goodFrom, goodUntil, weakFrom, weakUntil, obj, tempFrom)) {
+                        return;
+                    }
+                    double[] currentPoints = transposedPoints[obj];
+                    switch (ArrayHelper.transplantAndDecide(currentPoints, indices,
+                            goodFrom, goodUntil, weakFrom, weakUntil, medianSwap, tempFrom)) {
+                        case ArrayHelper.TRANSPLANT_LEFT_NOT_GREATER:
+                            --obj;
+                            break;
+                        case ArrayHelper.TRANSPLANT_RIGHT_SMALLER:
+                            return;
+                        case ArrayHelper.TRANSPLANT_GENERAL_CASE:
+                            double median = ArrayHelper.destructiveMedian(medianSwap, tempFrom, tempFrom + goodUntil - goodFrom + weakUntil - weakFrom);
+                            long goodSplit = splitMerge.splitInThree(currentPoints, indices, tempFrom, goodFrom, goodUntil, median);
+                            int goodMidL = SplitMergeHelper.extractMid(goodSplit);
+                            int goodMidR = SplitMergeHelper.extractRight(goodSplit);
+                            long weakSplit = splitMerge.splitInThree(currentPoints, indices, tempFrom, weakFrom, weakUntil, median);
+                            int weakMidL = SplitMergeHelper.extractMid(weakSplit);
+                            int weakMidR = SplitMergeHelper.extractRight(weakSplit);
+                            int tempMid = tempFrom + ((goodUntil - goodFrom + weakUntil - weakFrom) >>> 1);
+
+                            --obj;
+                            helperB(goodFrom, goodMidL, weakMidR, weakUntil, obj, tempFrom);
+                            helperB(goodMidL, goodMidR, weakMidR, weakUntil, obj, tempFrom);
+
+                            helperB(goodFrom, goodMidL, weakMidL, weakMidR, obj, tempFrom);
+                            helperB(goodMidL, goodMidR, weakMidL, weakMidR, obj, tempFrom);
+                            ++obj;
+
+                            ForkJoinTask<Integer> newWeakMidLTask = null;
+//                            if (pool != null && goodMidL - goodFrom + weakMidL - weakFrom > FORK_JOIN_THRESHOLD) {
+//                                newWeakMidLTask = helperBAsync(goodFrom, goodMidL, weakFrom, weakMidL, obj, tempFrom).fork();
+//                            }
+                            helperB(goodMidR, goodUntil, weakMidR, weakUntil, obj, tempMid);
+                            if (newWeakMidLTask != null) {
+                                newWeakMidLTask.join();
+                            } else {
+                                helperB(goodFrom, goodMidL, weakFrom, weakMidL, obj, tempFrom);
+                            }
+
+                            splitMerge.mergeThree(indices, tempFrom, goodFrom, goodMidL, goodMidL, goodMidR, goodMidR, goodUntil);
+                            splitMerge.mergeThree(indices, tempFrom, weakFrom, weakMidL, weakMidL, weakMidR, weakMidR, weakUntil);
+                            return;
+                    }
+                }
+                sweepB(goodFrom, goodUntil, weakFrom, weakUntil, tempFrom);
             }
         }
     }
