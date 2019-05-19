@@ -13,7 +13,7 @@ import ru.ifmo.orthant.util.DominanceHelper;
  * https://github.com/mbuzdalov/non-dominated-sorting
  * and adapted according to the needs of this repository.
  */
-public class BestOrderSort extends NonDominatedSorting {
+public final class BestOrderSort extends NonDominatedSorting {
     private int[][] objectiveIndices;
     private double[][] points;
     private int[] indices;

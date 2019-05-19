@@ -76,7 +76,7 @@ public final class ArrayHelper {
     public static final int TRANSPLANT_RIGHT_SMALLER = 1;
     public static final int TRANSPLANT_GENERAL_CASE = 2;
 
-    public static void transplant(double[] source, int[] indices, int from, int until, double[] target, int targetFrom) {
+    private static void transplant(double[] source, int[] indices, int from, int until, double[] target, int targetFrom) {
         for (int i = from; i < until; ++i, ++targetFrom) {
             target[targetFrom] = source[indices[i]];
         }
@@ -137,7 +137,8 @@ public final class ArrayHelper {
     private static int transplantAndDecideLeftBased(double[] source, int[] indices,
                                                     int leftFrom, int leftUntil,
                                                     int rightFrom, int rightUntil,
-                                                    double[] target, int targetFrom) {
+                                                    double[] target, int targetFrom,
+                                                    boolean isObjectiveStrict) {
         double leftMin = source[indices[leftFrom]];
         double leftMax = leftMin;
         target[targetFrom] = leftMin;
@@ -157,24 +158,40 @@ public final class ArrayHelper {
         target[targetFrom] = right;
         ++targetFrom;
         ++rightFrom;
-        if (leftMax <= right) {
-            return transplantAndCheckIfNotSmaller(source, indices, rightFrom, rightUntil, target, targetFrom, leftMax)
-                    ? TRANSPLANT_LEFT_NOT_GREATER
-                    : TRANSPLANT_GENERAL_CASE;
-        } else if (right < leftMin) {
-            return transplantAndCheckIfSmaller(source, indices, rightFrom, rightUntil, target, targetFrom, leftMin)
-                    ? TRANSPLANT_RIGHT_SMALLER
-                    : TRANSPLANT_GENERAL_CASE;
+        if (isObjectiveStrict) {
+            if (leftMax < right) {
+                return transplantAndCheckIfGreater(source, indices, rightFrom, rightUntil, target, targetFrom, leftMax)
+                        ? TRANSPLANT_LEFT_NOT_GREATER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else if (right <= leftMin) {
+                return transplantAndCheckIfNotGreater(source, indices, rightFrom, rightUntil, target, targetFrom, leftMin)
+                        ? TRANSPLANT_RIGHT_SMALLER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else {
+                transplant(source, indices, rightFrom, rightUntil, target, targetFrom);
+                return TRANSPLANT_GENERAL_CASE;
+            }
         } else {
-            transplant(source, indices, rightFrom, rightUntil, target, targetFrom);
-            return TRANSPLANT_GENERAL_CASE;
+            if (leftMax <= right) {
+                return transplantAndCheckIfNotSmaller(source, indices, rightFrom, rightUntil, target, targetFrom, leftMax)
+                        ? TRANSPLANT_LEFT_NOT_GREATER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else if (right < leftMin) {
+                return transplantAndCheckIfSmaller(source, indices, rightFrom, rightUntil, target, targetFrom, leftMin)
+                        ? TRANSPLANT_RIGHT_SMALLER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else {
+                transplant(source, indices, rightFrom, rightUntil, target, targetFrom);
+                return TRANSPLANT_GENERAL_CASE;
+            }
         }
     }
 
     private static int transplantAndDecideRightBased(double[] source, int[] indices,
                                                      int leftFrom, int leftUntil,
                                                      int rightFrom, int rightUntil,
-                                                     double[] target, int targetFrom) {
+                                                     double[] target, int targetFrom,
+                                                     boolean isObjectiveStrict) {
         double rightMin = source[indices[rightFrom]];
         double rightMax = rightMin;
         target[targetFrom] = rightMin;
@@ -194,30 +211,45 @@ public final class ArrayHelper {
         target[targetFrom] = left;
         ++targetFrom;
         ++leftFrom;
-        if (left > rightMax) {
-            return transplantAndCheckIfGreater(source, indices, leftFrom, leftUntil, target, targetFrom, rightMax)
-                    ? TRANSPLANT_RIGHT_SMALLER
-                    : TRANSPLANT_GENERAL_CASE;
-        } else if (rightMin >= left) {
-            return transplantAndCheckIfNotGreater(source, indices, leftFrom, leftUntil, target, targetFrom, rightMin)
-                    ? TRANSPLANT_LEFT_NOT_GREATER
-                    : TRANSPLANT_GENERAL_CASE;
+        if (isObjectiveStrict) {
+            if (left >= rightMax) {
+                return transplantAndCheckIfNotSmaller(source, indices, leftFrom, leftUntil, target, targetFrom, rightMax)
+                        ? TRANSPLANT_RIGHT_SMALLER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else if (rightMin > left) {
+                return transplantAndCheckIfSmaller(source, indices, leftFrom, leftUntil, target, targetFrom, rightMin)
+                        ? TRANSPLANT_LEFT_NOT_GREATER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else {
+                transplant(source, indices, leftFrom, leftUntil, target, targetFrom);
+                return TRANSPLANT_GENERAL_CASE;
+            }
         } else {
-            transplant(source, indices, leftFrom, leftUntil, target, targetFrom);
-            return TRANSPLANT_GENERAL_CASE;
+            if (left > rightMax) {
+                return transplantAndCheckIfGreater(source, indices, leftFrom, leftUntil, target, targetFrom, rightMax)
+                        ? TRANSPLANT_RIGHT_SMALLER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else if (rightMin >= left) {
+                return transplantAndCheckIfNotGreater(source, indices, leftFrom, leftUntil, target, targetFrom, rightMin)
+                        ? TRANSPLANT_LEFT_NOT_GREATER
+                        : TRANSPLANT_GENERAL_CASE;
+            } else {
+                transplant(source, indices, leftFrom, leftUntil, target, targetFrom);
+                return TRANSPLANT_GENERAL_CASE;
+            }
         }
     }
 
     public static int transplantAndDecide(double[] source, int[] indices,
                                           int leftFrom, int leftUntil,
                                           int rightFrom, int rightUntil,
-                                          double[] target, int targetFrom) {
+                                          double[] target, int targetFrom, boolean isObjectiveStrict) {
         if (leftUntil - leftFrom < rightUntil - rightFrom) {
             return transplantAndDecideLeftBased(source, indices,
-                    leftFrom, leftUntil, rightFrom, rightUntil, target, targetFrom);
+                    leftFrom, leftUntil, rightFrom, rightUntil, target, targetFrom, isObjectiveStrict);
         } else {
             return transplantAndDecideRightBased(source, indices,
-                    leftFrom, leftUntil, rightFrom, rightUntil, target, targetFrom);
+                    leftFrom, leftUntil, rightFrom, rightUntil, target, targetFrom, isObjectiveStrict);
         }
     }
 

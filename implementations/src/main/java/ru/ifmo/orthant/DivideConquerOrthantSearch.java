@@ -168,39 +168,41 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                         addIfDominates(firstIndex, secondIndex, d);
                     }
                     completePoint(secondIndex);
-                } else if (d == 1) {
-                    sweepA(from, until);
-                } else if (until - from <= getThreshold(d)) {
-                    hookA(from, until, d);
                 } else {
-                    double[] obj = transposedPoints[d];
-                    ArrayHelper.transplant(obj, indices, from, until, swap, from);
-                    double min = ArrayHelper.min(swap, from, until);
-                    double max = ArrayHelper.max(swap, from, until);
-                    if (min == max) {
-                        if (!isObjectiveStrict[d]) {
-                            helperA(from, until, d - 1);
-                        } else {
-                            completeRangeOfPoints(from, until);
+                    while (d > 1) {
+                        if (until - from <= getThreshold(d)) {
+                            hookA(from, until, d);
+                            return;
                         }
-                    } else {
-                        double median = ArrayHelper.destructiveMedian(swap, from, until);
-                        long splitResult = splitMergeHelper.splitInThree(obj, indices, from, from, until, median);
-                        int middleStart = SplitMergeHelper.extractMid(splitResult);
-                        int greaterStart = SplitMergeHelper.extractRight(splitResult);
+                        double[] obj = transposedPoints[d];
+                        if (ArrayHelper.transplantAndCheckIfSame(obj, indices, from, until, swap, from)) {
+                            if (!isObjectiveStrict[d]) {
+                                --d;
+                            } else {
+                                completeRangeOfPoints(from, until);
+                                return;
+                            }
+                        } else {
+                            double median = ArrayHelper.destructiveMedian(swap, from, until);
+                            long splitResult = splitMergeHelper.splitInThree(obj, indices, from, from, until, median);
+                            int middleStart = SplitMergeHelper.extractMid(splitResult);
+                            int greaterStart = SplitMergeHelper.extractRight(splitResult);
 
-                        helperA(from, middleStart, d);
-                        helperBAdapter(from, middleStart, greaterStart, d - 1);
-                        if (!isObjectiveStrict[d]) {
-                            helperA(middleStart, greaterStart, d - 1);
-                        } else {
-                            completeRangeOfPoints(middleStart, greaterStart);
+                            helperA(from, middleStart, d);
+                            helperBAdapter(from, middleStart, greaterStart, d - 1);
+                            if (!isObjectiveStrict[d]) {
+                                helperA(middleStart, greaterStart, d - 1);
+                            } else {
+                                completeRangeOfPoints(middleStart, greaterStart);
+                            }
+                            splitMergeHelper.mergeTwo(indices, lexIndices, from, from, middleStart, middleStart, greaterStart);
+                            helperBAdapter(from, greaterStart, until, d - 1);
+                            helperA(greaterStart, until, d);
+                            splitMergeHelper.mergeTwo(indices, lexIndices, from, from, greaterStart, greaterStart, until);
+                            return;
                         }
-                        splitMergeHelper.mergeTwo(indices, lexIndices, from, from, middleStart, middleStart, greaterStart);
-                        helperBAdapter(from, greaterStart, until, d - 1);
-                        helperA(greaterStart, until, d);
-                        splitMergeHelper.mergeTwo(indices, lexIndices, from, from, greaterStart, greaterStart, until);
                     }
+                    sweepA(from, until);
                 }
             }
         }
@@ -233,59 +235,50 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                     helperBGood1(goodFrom, weakFrom, weakUntil, d);
                 } else if (weakFrom + 1 == weakUntil) {
                     helperBWeak1(goodFrom, goodUntil, weakFrom, d);
-                } else if (d == 1) {
-                    sweepB(goodFrom, goodUntil, weakFrom, weakUntil, auxFrom);
-                } else if (goodUntil - goodFrom + weakUntil - weakFrom <= getThreshold(d)) {
-                    hookB(goodFrom, goodUntil, weakFrom, weakUntil, d);
                 } else {
-                    double[] obj = transposedPoints[d];
-                    boolean isStrict = isObjectiveStrict[d];
-                    ArrayHelper.transplant(obj, indices, goodFrom, goodUntil, swap, auxFrom);
-                    int auxMid = auxFrom + goodUntil - goodFrom;
-                    double goodMin = ArrayHelper.min(swap, auxFrom, auxMid);
-                    double goodMax = ArrayHelper.max(swap, auxFrom, auxMid);
-                    int auxUntil = auxMid + weakUntil - weakFrom;
-                    ArrayHelper.transplant(obj, indices, weakFrom, weakUntil, swap, auxMid);
-                    double weakMin = ArrayHelper.min(swap, auxMid, auxUntil);
-                    double weakMax = ArrayHelper.max(swap, auxMid, auxUntil);
-
-                    if (isStrict && goodMin >= weakMax || !isStrict && goodMin > weakMax) {
-                        // no good can dominate any weak
-                        return;
-                    }
-                    if (isStrict && goodMax < weakMin || !isStrict && goodMax <= weakMin) {
-                        // in coordinate d, every good dominate every weak
-                        helperB(goodFrom, goodUntil, weakFrom, weakUntil, auxFrom, d - 1);
-                    } else {
-                        double median = ArrayHelper.destructiveMedian(swap, auxFrom, auxUntil);
-
-                        long goodSplit = splitMergeHelper.splitInThree(obj, indices, auxFrom, goodFrom, goodUntil, median);
-                        int goodMiddleStart = SplitMergeHelper.extractMid(goodSplit);
-                        int goodGreaterStart = SplitMergeHelper.extractRight(goodSplit);
-
-                        long weakSplit = splitMergeHelper.splitInThree(obj, indices, auxFrom, weakFrom, weakUntil, median);
-                        int weakMiddleStart = SplitMergeHelper.extractMid(weakSplit);
-                        int weakGreaterStart = SplitMergeHelper.extractRight(weakSplit);
-
-                        // Heavy sub-problems
-                        helperB(goodFrom, goodMiddleStart, weakFrom, weakMiddleStart, auxFrom, d);
-                        helperB(goodGreaterStart, goodUntil, weakGreaterStart, weakUntil,
-                                auxFrom + goodMiddleStart - goodFrom + weakMiddleStart - weakFrom, d);
-
-                        // Guaranteed light sub-problems
-                        helperB(goodFrom, goodMiddleStart, weakMiddleStart, weakGreaterStart, auxFrom, d - 1);
-                        helperB(goodFrom, goodMiddleStart, weakGreaterStart, weakUntil, auxFrom, d - 1);
-                        helperB(goodMiddleStart, goodGreaterStart, weakGreaterStart, weakUntil, auxFrom, d - 1);
-
-                        if (!isStrict) {
-                            helperB(goodMiddleStart, goodGreaterStart, weakMiddleStart, weakGreaterStart, auxFrom, d - 1);
+                    int problemSize = goodUntil - goodFrom + weakUntil - weakFrom;
+                    while (d > 1) {
+                        if (problemSize <= getThreshold(d)) {
+                            hookB(goodFrom, goodUntil, weakFrom, weakUntil, d);
+                            return;
                         }
+                        double[] currentPoints = transposedPoints[d];
+                        boolean isStrict = isObjectiveStrict[d];
+                        switch (ArrayHelper.transplantAndDecide(currentPoints, indices,
+                                goodFrom, goodUntil, weakFrom, weakUntil, swap, auxFrom, isStrict)) {
+                            case ArrayHelper.TRANSPLANT_LEFT_NOT_GREATER:
+                                --d;
+                                continue;
+                            case ArrayHelper.TRANSPLANT_RIGHT_SMALLER:
+                                return;
+                            case ArrayHelper.TRANSPLANT_GENERAL_CASE:
+                                double median = ArrayHelper.destructiveMedian(swap, auxFrom, auxFrom + problemSize);
+                                long goodSplit = splitMergeHelper.splitInThree(currentPoints, indices, auxFrom, goodFrom, goodUntil, median);
+                                int goodMidL = SplitMergeHelper.extractMid(goodSplit);
+                                int goodMidR = SplitMergeHelper.extractRight(goodSplit);
+                                long weakSplit = splitMergeHelper.splitInThree(currentPoints, indices, auxFrom, weakFrom, weakUntil, median);
+                                int weakMidL = SplitMergeHelper.extractMid(weakSplit);
+                                int weakMidR = SplitMergeHelper.extractRight(weakSplit);
 
-                        splitMergeHelper.mergeThree(indices, lexIndices, auxFrom,
-                                goodFrom, goodMiddleStart, goodMiddleStart, goodGreaterStart, goodGreaterStart, goodUntil);
-                        splitMergeHelper.mergeThree(indices, lexIndices, auxFrom,
-                                weakFrom, weakMiddleStart, weakMiddleStart, weakGreaterStart, weakGreaterStart, weakUntil);
+                                --d;
+                                helperB(goodFrom, goodMidL, weakMidR, weakUntil, auxFrom, d);
+                                helperB(goodFrom, goodMidL, weakMidL, weakMidR, auxFrom, d);
+                                helperB(goodMidL, goodMidR, weakMidR, weakUntil, auxFrom, d);
+                                if (!isStrict) {
+                                    helperB(goodMidL, goodMidR, weakMidL, weakMidR, auxFrom, d);
+                                }
+                                ++d;
+
+                                int tempMid = auxFrom + (problemSize >>> 1);
+                                helperB(goodMidR, goodUntil, weakMidR, weakUntil, auxFrom, d);
+                                helperB(goodFrom, goodMidL, weakFrom, weakMidL, tempMid, d);
+
+                                splitMergeHelper.mergeThree(indices, lexIndices, auxFrom, goodFrom, goodMidL, goodMidL, goodMidR, goodMidR, goodUntil);
+                                splitMergeHelper.mergeThree(indices, lexIndices, auxFrom, weakFrom, weakMidL, weakMidL, weakMidR, weakMidR, weakUntil);
+                                return;
+                        }
                     }
+                    sweepB(goodFrom, goodUntil, weakFrom, weakUntil, auxFrom);
                 }
             }
         }

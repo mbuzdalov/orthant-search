@@ -19,7 +19,7 @@ import ru.ifmo.orthant.util.ArraySorter;
  * The particular revision location is:
  * https://github.com/mbuzdalov/non-dominated-sorting/tree/56fcfc61f5a4009e8ed02c0c3a4b00d390ba6aff
  */
-public class NonDominationTree extends NonDominatedSorting {
+public final class NonDominationTree extends NonDominatedSorting {
     private ArraySorter sorter;
     private SplitBuilder splitBuilder;
     private int[] indices;

@@ -14,7 +14,7 @@ import ru.ifmo.orthant.util.SplitMergeHelper;
  * https://github.com/mbuzdalov/non-dominated-sorting
  * and adapted according to the needs of this repository.
  */
-public class JensenENSHybrid extends NonDominatedSorting {
+public final class JensenENSHybrid extends NonDominatedSorting {
     private static final int STORAGE_MULTIPLE = 5;
     private static final int THRESHOLD_3D = 100;
     private static final int THRESHOLD_ALL = 200;
@@ -453,7 +453,7 @@ public class JensenENSHybrid extends NonDominatedSorting {
                     }
                     double[] currentPoints = transposedPoints[obj];
                     switch (ArrayHelper.transplantAndDecide(currentPoints, indices,
-                            goodFrom, goodUntil, weakFrom, weakUntil, medianSwap, tempFrom)) {
+                            goodFrom, goodUntil, weakFrom, weakUntil, medianSwap, tempFrom, false)) {
                         case ArrayHelper.TRANSPLANT_LEFT_NOT_GREATER:
                             --obj;
                             break;
