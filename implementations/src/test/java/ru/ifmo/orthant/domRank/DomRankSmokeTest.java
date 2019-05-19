@@ -13,14 +13,16 @@ public class DomRankSmokeTest {
     public void smokeTest() {
         Random random = new Random(282354312242L);
         DominanceRank[] algorithms = new DominanceRank[]{
-                new NaiveImplementation(180, 6),
-                new OrthantImplementation(new NaiveOrthantSearch(180, 6)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, false)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, true)),
+                new NaiveImplementation(678, 6),
+                new OrthantImplementation(new NaiveOrthantSearch(678, 6)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(678, 6, false, 1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(678, 6, true, 1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(678, 6, false, -1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(678, 6, true, -1)),
         };
 
         for (int t = 0; t < 300; ++t) {
-            int n = 30 + random.nextInt(150);
+            int n = 30 + random.nextInt(640);
             int d = 1 + random.nextInt(6);
             double[][] points = new double[n][d];
             if (random.nextBoolean()) {

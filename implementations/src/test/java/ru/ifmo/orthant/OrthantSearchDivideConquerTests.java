@@ -5,6 +5,6 @@ import java.util.function.BiFunction;
 public class OrthantSearchDivideConquerTests extends CorrectnessTestsBase {
     @Override
     protected BiFunction<Integer, Integer, OrthantSearch> getFactory() {
-        return (n, d) -> new DivideConquerOrthantSearch(n, d, false);
+        return (n, d) -> new DivideConquerOrthantSearch(n, d, false, 1);
     }
 }

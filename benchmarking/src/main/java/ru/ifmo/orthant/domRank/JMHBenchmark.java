@@ -51,10 +51,10 @@ public class JMHBenchmark {
                 algorithm = new OrthantImplementation(new NaiveOrthantSearch(n, dimension));
                 break;
             case "OrthantDivideConquer":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false));
+                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false, 1));
                 break;
             case "OrthantDivideConquerThreshold":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true));
+                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true, 1));
                 break;
             default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
         }

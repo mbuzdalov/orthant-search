@@ -7,6 +7,6 @@ import ru.ifmo.orthant.DivideConquerOrthantSearch;
 public class NDSOrthantDivideConquerTests extends CorrectnessTestsBase {
     @Override
     protected BiFunction<Integer, Integer, NonDominatedSorting> getFactory() {
-        return (n, d) -> new OrthantImplementation(new DivideConquerOrthantSearch(n, d, false));
+        return (n, d) -> new OrthantImplementation(new DivideConquerOrthantSearch(n, d, false, 1));
     }
 }

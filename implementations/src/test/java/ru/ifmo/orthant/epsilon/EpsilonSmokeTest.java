@@ -12,15 +12,17 @@ public class EpsilonSmokeTest {
     public void smokeTest() {
         Random random = new Random(282354312242L);
         AdditiveEpsilonIndicator[] algorithms = new AdditiveEpsilonIndicator[] {
-                new NaiveImplementation(180, 6),
-                new OrthantImplementation(new NaiveOrthantSearch(360, 6)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(360, 6, false)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(360, 6, true)),
+                new NaiveImplementation(360, 6),
+                new OrthantImplementation(new NaiveOrthantSearch(720, 6)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(720, 6, false, 1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(720, 6, true, 1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(720, 6, false, -1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(720, 6, true, -1)),
         };
 
         for (int t = 0; t < 300; ++t) {
-            int m = 5 + random.nextInt(150);
-            int f = 5 + random.nextInt(150);
+            int m = 5 + random.nextInt(300);
+            int f = 5 + random.nextInt(300);
             int d = 1 + random.nextInt(6);
             double[][] moving = new double[m][d];
             double[][] fixed = new double[f][d];

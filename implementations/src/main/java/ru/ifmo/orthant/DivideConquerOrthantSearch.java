@@ -1,6 +1,9 @@
 package ru.ifmo.orthant;
 
 import java.util.Arrays;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
 
 import ru.ifmo.orthant.util.ArrayHelper;
 import ru.ifmo.orthant.util.SplitMergeHelper;
@@ -12,8 +15,11 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
     private final double[] swap;
     private final int threshold3D, thresholdAll;
     private final SplitMergeHelper helper;
+    private final ForkJoinPool fjPool;
 
-    public DivideConquerOrthantSearch(int maxPoints, int maxDimension, boolean useThreshold) {
+    private static final int FORK_JOIN_THRESHOLD = 400;
+
+    public DivideConquerOrthantSearch(int maxPoints, int maxDimension, boolean useThreshold, int maxThreads) {
         transposedPoints = new double[maxDimension][maxPoints];
         indices = new int[maxPoints];
         lexIndices = new int[maxPoints];
@@ -21,6 +27,16 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         helper = new SplitMergeHelper(maxPoints);
         threshold3D = useThreshold ? 50 : 0;
         thresholdAll = useThreshold ? 100 : 0;
+
+        if (maxDimension <= 3 || maxPoints < FORK_JOIN_THRESHOLD) {
+            maxThreads = 1;
+        }
+        int nProcessors = Runtime.getRuntime().availableProcessors();
+        if (maxThreads == 1 || nProcessors == 1) {
+            fjPool = null;
+        } else {
+            fjPool = new ForkJoinPool(maxThreads <= 0 ? nProcessors : maxThreads);
+        }
     }
 
     @Override
@@ -66,7 +82,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                     indices, lexIndices, swap, helper,
                     dataCollection, queryCollection, additionalCollection,
                     typeClass, isObjectiveStrict, dimension,
-                    threshold3D, thresholdAll);
+                    threshold3D, thresholdAll, fjPool);
 
             handler.lexSort(from, until);
 
@@ -110,6 +126,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
         private final boolean[] isObjectiveStrict;
         private final int dimension;
         private final int threshold3D, thresholdAll;
+        private final ForkJoinPool fjPool;
 
         private boolean allPointsAreQueryPoints;
         private boolean allPointsAreDataPoints;
@@ -119,7 +136,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                 int[] indices, int[] lexIndices, double[] swap, SplitMergeHelper splitMergeHelper,
                 T dataCollection, T queryCollection, T additionalCollection,
                 ValueTypeClass<T> typeClass, boolean[] isObjectiveStrict, int dimension,
-                int threshold3D, int thresholdAll) {
+                int threshold3D, int thresholdAll, ForkJoinPool fjPool) {
             this.points = points;
             this.transposedPoints = transposedPoints;
             this.isDataPoint = isDataPoint;
@@ -136,6 +153,7 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             this.dimension = dimension;
             this.threshold3D = threshold3D;
             this.thresholdAll = thresholdAll;
+            this.fjPool = fjPool;
         }
 
         private int getThreshold(int dimension) {
@@ -151,7 +169,11 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
             }
             this.allPointsAreDataPoints = !hasNonDataPoint;
             this.allPointsAreQueryPoints = !hasNonQueryPoint;
-            helperA(from, until, dimension - 1);
+            if (fjPool != null && dimension > 3) {
+                fjPool.submit(() -> helperA(from, until, dimension - 1)).join();
+            } else {
+                helperA(from, until, dimension - 1);
+            }
         }
 
         // Assumption: for points P and Q at indices i < j,
@@ -253,10 +275,12 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                                 return;
                             case ArrayHelper.TRANSPLANT_GENERAL_CASE:
                                 double median = ArrayHelper.destructiveMedian(swap, auxFrom, auxFrom + problemSize);
-                                long goodSplit = splitMergeHelper.splitInThree(currentPoints, indices, auxFrom, goodFrom, goodUntil, median);
+                                long goodSplit = splitMergeHelper.splitInThree(currentPoints, indices, auxFrom,
+                                        goodFrom, goodUntil, median);
                                 int goodMidL = SplitMergeHelper.extractMid(goodSplit);
                                 int goodMidR = SplitMergeHelper.extractRight(goodSplit);
-                                long weakSplit = splitMergeHelper.splitInThree(currentPoints, indices, auxFrom, weakFrom, weakUntil, median);
+                                long weakSplit = splitMergeHelper.splitInThree(currentPoints, indices, auxFrom,
+                                        weakFrom, weakUntil, median);
                                 int weakMidL = SplitMergeHelper.extractMid(weakSplit);
                                 int weakMidR = SplitMergeHelper.extractRight(weakSplit);
 
@@ -269,18 +293,37 @@ public final class DivideConquerOrthantSearch extends OrthantSearch {
                                 }
                                 ++d;
 
-                                int tempMid = auxFrom + (problemSize >>> 1);
-                                helperB(goodMidR, goodUntil, weakMidR, weakUntil, auxFrom, d);
-                                helperB(goodFrom, goodMidL, weakFrom, weakMidL, tempMid, d);
+                                boolean shallFork = fjPool != null && problemSize >= FORK_JOIN_THRESHOLD;
+                                ForkJoinTask<Void> task = shallFork
+                                        ? helperBAsync(goodFrom, goodMidL, weakFrom, weakMidL, auxFrom, d).fork()
+                                        : null;
 
-                                splitMergeHelper.mergeThree(indices, lexIndices, auxFrom, goodFrom, goodMidL, goodMidL, goodMidR, goodMidR, goodUntil);
-                                splitMergeHelper.mergeThree(indices, lexIndices, auxFrom, weakFrom, weakMidL, weakMidL, weakMidR, weakMidR, weakUntil);
+                                helperB(goodMidR, goodUntil, weakMidR, weakUntil, auxFrom + (problemSize >>> 1), d);
+                                if (shallFork) {
+                                    task.join();
+                                } else {
+                                    helperB(goodFrom, goodMidL, weakFrom, weakMidL, auxFrom, d);
+                                }
+
+                                splitMergeHelper.mergeThree(indices, lexIndices, auxFrom,
+                                        goodFrom, goodMidL, goodMidL, goodMidR, goodMidR, goodUntil);
+                                splitMergeHelper.mergeThree(indices, lexIndices, auxFrom,
+                                        weakFrom, weakMidL, weakMidL, weakMidR, weakMidR, weakUntil);
                                 return;
                         }
                     }
                     sweepB(goodFrom, goodUntil, weakFrom, weakUntil, auxFrom);
                 }
             }
+        }
+
+        private ForkJoinTask<Void> helperBAsync(int goodFrom, int goodUntil, int weakFrom, int weakUntil, int auxFrom, int d) {
+            return new RecursiveAction() {
+                @Override
+                protected void compute() {
+                    helperB(goodFrom, goodUntil, weakFrom, weakUntil, auxFrom, d);
+                }
+            };
         }
 
         private void helperBGood1(int good, int weakFrom, int weakUntil, int d) {

@@ -13,11 +13,13 @@ public class EpsilonIBEASmokeTest {
     public void smokeTest() {
         Random random = new Random(282354312242L);
         double kappa = 1.2345;
-        EpsilonIBEAFitnessAssignment[] algorithms = new EpsilonIBEAFitnessAssignment[]{
-                new NaiveImplementation(180, 6, kappa),
+        EpsilonIBEAFitnessAssignment[] algorithms = new EpsilonIBEAFitnessAssignment[] {
+                new NaiveImplementation(360, 6, kappa),
                 new OrthantImplementation(new NaiveOrthantSearch(180, 6), kappa),
-                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, false), kappa),
-                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, true), kappa),
+                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, false, 1), kappa),
+                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, true, 1), kappa),
+                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, false, -1), kappa),
+                new OrthantImplementation(new DivideConquerOrthantSearch(180, 6, true, -1), kappa),
         };
 
         for (int t = 0; t < 300; ++t) {

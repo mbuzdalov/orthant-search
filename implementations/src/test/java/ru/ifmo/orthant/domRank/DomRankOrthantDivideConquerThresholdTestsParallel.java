@@ -4,9 +4,9 @@ import java.util.function.BiFunction;
 
 import ru.ifmo.orthant.DivideConquerOrthantSearch;
 
-public class DomRankOrthantDivideConquerThresholdTests extends CorrectnessTestsBase {
+public class DomRankOrthantDivideConquerThresholdTestsParallel extends CorrectnessTestsBase {
     @Override
     protected BiFunction<Integer, Integer, DominanceRank> getFactory() {
-        return (n, d) -> new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true, 1));
+        return (n, d) -> new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true, -1));
     }
 }

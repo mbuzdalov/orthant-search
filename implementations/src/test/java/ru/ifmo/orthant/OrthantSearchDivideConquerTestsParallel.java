@@ -2,9 +2,9 @@ package ru.ifmo.orthant;
 
 import java.util.function.BiFunction;
 
-public class OrthantSearchDivideConquerThresholdTests extends CorrectnessTestsBase {
+public class OrthantSearchDivideConquerTestsParallel extends CorrectnessTestsBase {
     @Override
     protected BiFunction<Integer, Integer, OrthantSearch> getFactory() {
-        return (n, d) -> new DivideConquerOrthantSearch(n, d, true, 1);
+        return (n, d) -> new DivideConquerOrthantSearch(n, d, false, -1);
     }
 }

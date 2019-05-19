@@ -16,8 +16,8 @@ public class RunSingleTest {
         NonDominatedSorting[] sortings = {
                 new NaiveImplementation(n, d),
                 new OrthantImplementation(new NaiveOrthantSearch(n, d)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(n, d, false)),
-                new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true))
+                new OrthantImplementation(new DivideConquerOrthantSearch(n, d, false, 1)),
+                new OrthantImplementation(new DivideConquerOrthantSearch(n, d, true, 1))
         };
         String[] sortingNames = {
                 "Naive NDS:      ",
