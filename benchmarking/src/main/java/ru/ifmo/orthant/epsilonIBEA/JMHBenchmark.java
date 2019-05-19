@@ -4,8 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-import ru.ifmo.orthant.DivideConquerOrthantSearch;
-import ru.ifmo.orthant.NaiveOrthantSearch;
+import ru.ifmo.orthant.ParameterParser;
 import ru.ifmo.orthant.PointSets;
 
 @State(Scope.Benchmark)
@@ -45,20 +44,10 @@ public class JMHBenchmark {
             case "uniform.hyperplane": instances = PointSets.generateUniformHyperplanes(nInstances, n, dimension, 1); break;
             default: throw new AssertionError("Dataset ID '" + datasetId + "' is not known");
         }
-        switch (usedAlgorithm) {
-            case "NaiveImplementation":
-                algorithm = new NaiveImplementation(n, dimension, kappa);
-                break;
-            case "OrthantNaive":
-                algorithm = new OrthantImplementation(new NaiveOrthantSearch(n, dimension - 1), kappa);
-                break;
-            case "OrthantDivideConquer":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension - 1, false, 1), kappa);
-                break;
-            case "OrthantDivideConquerThreshold":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension - 1, true, 1), kappa);
-                break;
-            default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
+        if (usedAlgorithm.equals("NaiveImplementation")) {
+            algorithm = new NaiveImplementation(n, dimension, kappa);
+        } else {
+            algorithm = new OrthantImplementation(ParameterParser.parseUsedOrthantAlgorithm(usedAlgorithm, n, dimension - 1), kappa);
         }
         results = new double[n];
     }

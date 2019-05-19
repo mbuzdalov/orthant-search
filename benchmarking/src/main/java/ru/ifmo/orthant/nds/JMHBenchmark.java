@@ -4,12 +4,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import ru.ifmo.orthant.ParameterParser;
 import ru.ifmo.orthant.PointSets;
-import ru.ifmo.orthant.DivideConquerOrthantSearch;
-import ru.ifmo.orthant.NaiveOrthantSearch;
 import ru.ifmo.orthant.nds.extra.BestOrderSort;
-import ru.ifmo.orthant.nds.extra.NonDominationTree;
 import ru.ifmo.orthant.nds.extra.JensenENSHybrid;
+import ru.ifmo.orthant.nds.extra.NonDominationTree;
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -51,15 +50,6 @@ public class JMHBenchmark {
             case "NaiveImplementation":
                 algorithm = new NaiveImplementation(n, dimension);
                 break;
-            case "OrthantNaive":
-                algorithm = new OrthantImplementation(new NaiveOrthantSearch(n, dimension));
-                break;
-            case "OrthantDivideConquer":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, false, 1));
-                break;
-            case "OrthantDivideConquerThreshold":
-                algorithm = new OrthantImplementation(new DivideConquerOrthantSearch(n, dimension, true, 1));
-                break;
             case "JensenENSHybrid":
                 algorithm = new JensenENSHybrid(n, dimension);
                 break;
@@ -69,7 +59,9 @@ public class JMHBenchmark {
             case "BestOrderSort":
                 algorithm = new BestOrderSort(n, dimension);
                 break;
-            default: throw new AssertionError("Algorithm ID '" + usedAlgorithm + "' is not known");
+            default:
+                algorithm = new OrthantImplementation(ParameterParser.parseUsedOrthantAlgorithm(usedAlgorithm, n, dimension));
+                break;
         }
         results = new int[n];
     }
