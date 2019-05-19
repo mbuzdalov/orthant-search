@@ -1,11 +1,9 @@
 package ru.ifmo.orthant.nds.extra;
 
 import java.util.Arrays;
-import java.util.concurrent.ForkJoinTask;
 
 import ru.ifmo.orthant.nds.NonDominatedSorting;
 import ru.ifmo.orthant.nds.extra.util.RedBlackTree;
-
 import ru.ifmo.orthant.util.ArrayHelper;
 import ru.ifmo.orthant.util.ArraySorter;
 import ru.ifmo.orthant.util.DominanceHelper;
@@ -479,16 +477,8 @@ public class JensenENSHybrid extends NonDominatedSorting {
                             helperB(goodMidL, goodMidR, weakMidL, weakMidR, obj, tempFrom);
                             ++obj;
 
-                            ForkJoinTask<Integer> newWeakMidLTask = null;
-//                            if (pool != null && goodMidL - goodFrom + weakMidL - weakFrom > FORK_JOIN_THRESHOLD) {
-//                                newWeakMidLTask = helperBAsync(goodFrom, goodMidL, weakFrom, weakMidL, obj, tempFrom).fork();
-//                            }
                             helperB(goodMidR, goodUntil, weakMidR, weakUntil, obj, tempMid);
-                            if (newWeakMidLTask != null) {
-                                newWeakMidLTask.join();
-                            } else {
-                                helperB(goodFrom, goodMidL, weakFrom, weakMidL, obj, tempFrom);
-                            }
+                            helperB(goodFrom, goodMidL, weakFrom, weakMidL, obj, tempFrom);
 
                             splitMerge.mergeThree(indices, tempFrom, goodFrom, goodMidL, goodMidL, goodMidR, goodMidR, goodUntil);
                             splitMerge.mergeThree(indices, tempFrom, weakFrom, weakMidL, weakMidL, weakMidR, weakMidR, weakUntil);
