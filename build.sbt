@@ -10,7 +10,7 @@ lazy val junitInterface = "com.github.sbt" % "junit-interface" % "0.13.3" % "tes
 
 lazy val root = project
   .in(file("."))
-  .settings(commonSettings :_*)
+  .settings(commonSettings*)
   .settings(name    := "orthant-search",
             version := "0.0.0")
   .dependsOn(implementations, benchmarking)
@@ -18,13 +18,13 @@ lazy val root = project
 
 lazy val implementations = project
   .in(file("implementations"))
-  .settings(commonSettings :_*)
+  .settings(commonSettings*)
   .settings(name    := "orthant-search-implementations",
             version := "0.0.0")
 
 lazy val benchmarking = project
   .in(file("benchmarking"))
-  .settings(commonSettings :_*)
+  .settings(commonSettings*)
   .settings(name    := "orthant-search-benchmarking",
             version := "0.0.0")
   .dependsOn(implementations)
